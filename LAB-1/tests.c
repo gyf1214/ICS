@@ -1,6 +1,6 @@
 /* Testing Code */
 
-// #include <limits.h>
+#include <limits.h>
 #include <math.h>
 
 /* Routines used by floation point test code */
