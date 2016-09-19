@@ -1,5 +1,4 @@
 #!/bin/bash
-
 CC=gcc
 CCFLAGS="-g -Wall"
 OBJ=tmp/test
