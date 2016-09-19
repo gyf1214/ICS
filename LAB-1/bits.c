@@ -186,7 +186,8 @@ int thirdBits(void) {
  *   Rating: 1
  */
 int isTmin(int x) {
-    return !!((!(x << 1)) & (x >> 31));
+    int y = (~x) + 1;
+    return (!(x ^ y)) & (!!x);
 }
 //2
 /*
@@ -207,7 +208,7 @@ int isNotEqual(int x, int y) {
  *   Rating: 2
  */
 int anyOddBit(int x) {
-    unsigned y = 0xAA;
+    int y = 0xAA;
     y = y | (y << 8);
     y = y | (y << 16);
     return !!(x & y);
@@ -231,7 +232,7 @@ int negate(int x) {
  *   Rating: 3
  */
 int conditional(int x, int y, int z) {
-    unsigned t = (~(!x)) + 1;
+    int t = (~(!x)) + 1;
     return ((~t) & y) | (t & z);
 }
 /*
