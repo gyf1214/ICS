@@ -287,7 +287,29 @@ int bitParity(int x) {
  *  Rating: 4
  */
 int howManyBits(int x) {
-  return 0;
+    int y = 0, z = 0, t;
+
+    z = y | 16;
+    t = !(((x << z) >> z) ^ x);
+    y = y | (t << 4);
+
+    z = y | 8;
+    t = !(((x << z) >> z) ^ x);
+    y = y | (t << 3);
+
+    z = y | 4;
+    t = !(((x << z) >> z) ^ x);
+    y = y | (t << 2);
+
+    z = y | 2;
+    t = !(((x << z) >> z) ^ x);
+    y = y | (t << 1);
+
+    z = y | 1;
+    t = !(((x << z) >> z) ^ x);
+    y = y | t;
+
+    return y + 1;
 }
 //float
 /*
