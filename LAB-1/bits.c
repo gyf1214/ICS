@@ -328,7 +328,18 @@ int howManyBits(int x) {
  *   Rating: 4
  */
 unsigned float_half(unsigned uf) {
-  return 2;
+    unsigned expo = (uf >> 23) & 0xFF;
+    if (expo == 0xFF) {
+        return uf;
+    } else if (expo <= 1) {
+        unsigned mask = (1 << 23) - 1;
+        unsigned frac = uf & mask;
+        unsigned ffrac = (frac >> 1) | (expo << 22);
+        ffrac = ffrac + ((frac & ffrac) & 1);
+        return (uf & (1 << 31)) | ffrac;
+    } else {
+        return uf - (1 << 23);
+    }
 }
 /*
  * float_i2f - Return bit-level equivalent of expression (float) x
