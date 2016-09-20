@@ -392,10 +392,11 @@ unsigned float_i2f(int x) {
  */
 int float_f2i(unsigned uf) {
     unsigned flag = uf & (1 << 31);
+    unsigned frac, ret;
     int expo = ((uf >> 23) & 0xFF) - 0x7F;
     if (expo < 0) return 0;
     if (expo > 30) return 0x80000000;
-    unsigned frac = (uf & ((1 << 23) - 1)) | (1 << 23);
-    unsigned ret = (frac << 8) >> (31 - expo);
+    frac = (uf & ((1 << 23) - 1)) | (1 << 23);
+    ret = (frac << 8) >> (31 - expo);
     return flag ? -ret : ret;
 }
