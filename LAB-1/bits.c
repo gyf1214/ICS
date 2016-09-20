@@ -351,7 +351,29 @@ unsigned float_half(unsigned uf) {
  *   Rating: 4
  */
 unsigned float_i2f(int x) {
-  return 2;
+    unsigned ret = 0;
+    if (x < 0) {
+        if (x == 0x80000000) return 0xcf000000;
+        x = -x;
+        ret = ret | (1 << 31);
+    } else if (!x) {
+        return 0;
+    }
+    unsigned expo = 0x7F;
+    unsigned frac = x;
+    int t = 16;
+    while (t) {
+        if (x >> t) {
+            expo += t;
+            x = x >> t;
+        }
+        t = t >> 1;
+    }
+    frac = frac << (0x9F - expo);
+    unsigned ffrac = frac >> 9;
+    frac = frac & ((1 << 9) - 1);
+    if (frac > (1 << 8) || (frac == (1 << 8) && (ffrac & 1))) ++ffrac;
+    return (ffrac | (expo << 23)) | ret;
 }
 /*
  * float_f2i - Return bit-level equivalent of expression (int) f
@@ -366,5 +388,11 @@ unsigned float_i2f(int x) {
  *   Rating: 4
  */
 int float_f2i(unsigned uf) {
-  return 2;
+    unsigned flag = uf & (1 << 31);
+    int expo = ((uf >> 23) & 0xFF) - 0x7F;
+    if (expo < 0) return 0;
+    if (expo > 30) return 0x80000000;
+    unsigned frac = (uf & ((1 << 23) - 1)) | (1 << 23);
+    unsigned ret = (frac << 8) >> (31 - expo);
+    return flag ? -ret : ret;
 }
