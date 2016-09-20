@@ -6,7 +6,7 @@ CFLAGS = -O1 -Wall -m32
 LIBS = -lm
 
 test: all
-	./driver.pl
+	./driver.pl 2> /dev/null
 
 all: btest
 
