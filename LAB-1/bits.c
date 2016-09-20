@@ -309,7 +309,7 @@ int howManyBits(int x) {
     t = !(((x << z) >> z) ^ x);
     y = y | t;
 
-    return y + 1;
+    return 33 + (~y);
 }
 //float
 /*
