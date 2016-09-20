@@ -244,7 +244,10 @@ int conditional(int x, int y, int z) {
  *   Rating: 3
  */
 int subOK(int x, int y) {
-  return 2;
+    int yy = (~y) + 1;
+    int z = x + yy;
+
+    return !(((x ^ y) & (x ^ z)) & (1 << 31));
 }
 /*
  * isGreater - if x > y  then return 1, else return 0
@@ -254,9 +257,10 @@ int subOK(int x, int y) {
  *   Rating: 3
  */
 int isGreater(int x, int y) {
-    x = (~x) + 1;
-    return !!((x + y) & (1 << 31));
-    //TODO
+    int xx = (~x) + 1;
+    int z = xx + y;
+
+    return !!((((x ^ y) & y) | ((~(x ^ y)) & z)) & (1 << 31));
 }
 //4
 /*
