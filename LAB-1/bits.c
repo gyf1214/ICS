@@ -359,7 +359,7 @@ unsigned float_i2f(int x) {
     } else if (!x) {
         return 0;
     }
-    unsigned expo = 0x7F;
+    unsigned expo = 0;
     unsigned frac = x;
     int t = 16;
     while (t) {
@@ -369,11 +369,13 @@ unsigned float_i2f(int x) {
         }
         t = t >> 1;
     }
-    frac = frac << (0x9F - expo);
+    frac = frac << (32 - expo);
     unsigned ffrac = frac >> 9;
-    frac = frac & ((1 << 9) - 1);
-    if (frac > (1 << 8) || (frac == (1 << 8) && (ffrac & 1))) ++ffrac;
-    return (ffrac | (expo << 23)) | ret;
+    frac = frac & 0x1FF;
+    expo = expo + 0x7F;
+    ret = (ret | ffrac) | (expo << 23);
+    if (frac > 0x100 || (frac == 0x100 && (ffrac & 1))) ++ret;
+    return ret;
 }
 /*
  * float_f2i - Return bit-level equivalent of expression (int) f
