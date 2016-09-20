@@ -352,6 +352,9 @@ unsigned float_half(unsigned uf) {
  */
 unsigned float_i2f(int x) {
     unsigned ret = 0;
+    unsigned expo = 0;
+    unsigned frac, ffrac;
+    int t = 16;
     if (x < 0) {
         if (x == 0x80000000) return 0xcf000000;
         x = -x;
@@ -359,9 +362,7 @@ unsigned float_i2f(int x) {
     } else if (!x) {
         return 0;
     }
-    unsigned expo = 0;
-    unsigned frac = x;
-    int t = 16;
+    frac = x;
     while (t) {
         if (x >> t) {
             expo += t;
@@ -370,7 +371,7 @@ unsigned float_i2f(int x) {
         t = t >> 1;
     }
     frac = frac << (32 - expo);
-    unsigned ffrac = frac >> 9;
+    ffrac = frac >> 9;
     frac = frac & 0x1FF;
     expo = expo + 0x7F;
     ret = (ret | ffrac) | (expo << 23);
