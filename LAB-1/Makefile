@@ -5,7 +5,9 @@ CC = gcc
 CFLAGS = -O1 -Wall -m32
 LIBS = -lm
 
-test: all
+test: do_test clean
+
+do_test: all
 	./driver.pl 2> /dev/null
 
 all: btest
