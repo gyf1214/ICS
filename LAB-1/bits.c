@@ -198,7 +198,7 @@ int isTmin(int x) {
  *   Rating: 2
  */
 int isNotEqual(int x, int y) {
-    return !(x ^ y);
+    return !!(x ^ y);
 }
 /*
  * anyOddBit - return 1 if any odd-numbered bit in word set to 1
