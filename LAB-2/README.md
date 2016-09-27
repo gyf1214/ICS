@@ -1,4 +1,4 @@
-## LAB-2 Notes ##
+# LAB-2 Notes #
 
 Fuck tao@ubuntu64!
 
