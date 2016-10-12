@@ -1,26 +1,28 @@
 HEX= ./hex2raw
 CTAR= ./ctarget
+RTAR= ./rtarget
 AS= as
 LD= ld
 LDFLAGS= -e rsp --oformat binary -Ttext 0x5561b8e8
+TARS= 1 2 3
+OBJS= $(patsubst %, bin/%, $(TARS))
+TESTS= $(patsubst %, test%, $(TARS))
 
-bin/3: obj/3.o
+forse_rebuild: clean main
+
+clean:
+	rm -f bin/* obj/*
+
+main: $(OBJS)
+
+test%: bin/%
+	$(TAR) < $<
+
+bin/%: obj/%.o
 	$(LD) $(LDFLAGS) -o $@ $<
 
-obj/3.o: src/3.s
-	$(AS) -o $@ $<
-
-test2: bin/2
-	$(CTAR) < $<
-
-bin/2: obj/2.o
-	$(LD) $(LDFLAGS) -o $@ $<
-
-obj/2.o: src/2.s
-	$(AS) -o $@ $<
-
-test1: bin/1
-	$(CTAR) < $<
-
-bin/1: src/1.hex
+bin/%: src/%.hex
 	$(HEX) < $< > $@
+
+obj/%.o: src/%.s
+	$(AS) -o $@ $<
