@@ -4,6 +4,9 @@ AS= as
 LD= ld
 LDFLAGS= -e rsp --oformat binary -Ttext
 
+test2: bin/2
+	$(CTAR) < $<
+
 bin/2: obj/2.o
 	$(LD) $(LDFLAGS) 0x5561b8e8 -o $@ $<
 
