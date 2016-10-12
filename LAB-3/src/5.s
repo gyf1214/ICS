@@ -11,7 +11,7 @@ rdi:
     .quad data - rdi    /* offset */
     .quad 0x401b04      /* movl %eax, %edx */
     .quad 0x401a8d      /* movl %edx, %ecx */
-    .quad 0x401ac2      /* movl %ecx, %esi */
+    .quad 0x401ac3      /* movl %ecx, %esi */
     .quad 0x401a79      /* jmpq <add_xy>  */
     .quad 0x401a46      /* movq %rax, %rdi */
     .quad 0x4019a0      /* touch3 */
