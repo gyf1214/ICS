@@ -9,7 +9,7 @@ rdi:
     .quad 0x401a46      /* movq %rax, %rdi */
     .quad 0x401a40      /* popq %rax */
     .quad data - rdi    /* offset */
-    .quad 0x401b0b      /* movl %eax, %edx */
+    .quad 0x401b0a      /* movl %eax, %edx */
     .quad 0x401a8e      /* movl %edx, %ecx */
     .quad 0x401ac2      /* movl %ecx, %esi */
     .quad 0x401a79      /* jmpq <add_xy>  */
