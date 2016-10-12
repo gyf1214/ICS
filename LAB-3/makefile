@@ -11,7 +11,11 @@ OBJS= $(patsubst %, bin/%, $(CBINS) $(RBINS))
 CTESTS= $(patsubst %, test%, $(CBINS))
 RTESTS= $(patsubst %, test%, $(RBINS))
 
-forse_rebuild: clean main
+force_rebuild: clean main
+
+force_test: clean main $(CTESTS) $(RTESTS)
+
+test: main $(CTESTS) $(RTESTS)
 
 clean:
 	rm -f bin/* obj/*
