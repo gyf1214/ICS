@@ -14,6 +14,7 @@ rdi:
     .quad 0x401ac2      /* movl %ecx, %esi */
     .quad 0x401a79      /* jmpq <add_xy>  */
     .quad 0x401a46      /* movq %rax, %rdi */
+    .quad 0x4019a0      /* touch3 */
 
 data:
     .asciz "2a402507"
