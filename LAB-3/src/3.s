@@ -1,6 +1,6 @@
 .globl rsp
 rsp:
-    subq $0x18, $rsp
+    subq $0x18, %rsp
     movq $data, %rdi
     pushq $0x4019a0
     retq
