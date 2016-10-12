@@ -1,3 +1,4 @@
+.globl rsp
 rsp:
     movl 0x605524, %edi
     pushq $0x40188f
