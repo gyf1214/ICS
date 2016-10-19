@@ -1,0 +1,59 @@
+.pos 0
+
+Code:
+init:
+    irmovl Stack, %esp
+    rrmovl %esp, %ebp
+    irmovl 3, %eax
+    pushl %eax
+    irmovl dest, %eax
+    pushl %eax
+    irmovl src, %eax
+    pushl %eax
+    call copy_block
+    irmovl 12, %ecx
+    addl %ecx, %esp
+    halt
+
+copy_block:
+    pushl %ebp
+    rrmovl %esp, %ebp
+    pushl %ebx
+    pushl %esi
+    pushl %edi
+    xorl %eax, %eax
+    mrmovl 0x10(%ebp), %edx
+    mrmovl 0x8(%ebp), %ecx
+    mrmovl 0xc(%ebp), %edi
+    jmp L1
+L0:
+    irmovl 4, %esi
+    mrmovl (%ecx), %ebx
+    addl %esi, %ecx
+    rmmovl %ebx, (%edi)
+    addl %esi, %edi
+    xorl %ebx, %eax
+    irmovl 1, %esi
+    subl %esi, %edx
+L1:
+    andl %edx, %edx
+    jg L0
+    popl %edi
+    popl %esi
+    popl %ebx
+    popl %ebp
+    ret
+
+Data:
+.align 4
+src:
+    .long 0x00a
+    .long 0x0b0
+    .long 0xc00
+dest:
+    .long 0x111
+    .long 0x222
+    .long 0x333
+
+.pos 0x100
+Stack:
