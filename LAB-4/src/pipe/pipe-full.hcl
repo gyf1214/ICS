@@ -272,6 +272,7 @@ bool set_cc = E_icode in { IOPL, IIADDL } &&
 ## Generate valA in execute stage
 int e_valA = [
     E_icode == IJXX && E_ifun != UNCOND : E_valC;
+    M_icode in { IMRMOVL, IPOPL } && E_icode in { IRMMOVL, IPUSHL} : m_valM;
     1 : E_valA;
 ];
 
@@ -330,7 +331,8 @@ bool F_bubble = 0;
 bool F_stall =
 	# Conditions for a load/use hazard
 	E_icode in { IMRMOVL, IPOPL } &&
-	 E_dstM in { d_srcA, d_srcB } ||
+	 E_dstM in { d_srcA, d_srcB } &&
+     !(D_icode in { IRMMOVL, IPUSHL } && D_rB != E_dstM) ||
 	# Stalling at fetch while ret passes through pipeline
 	IRET in { D_icode, E_icode, M_icode };
 
@@ -339,14 +341,17 @@ bool F_stall =
 bool D_stall =
 	# Conditions for a load/use hazard
 	E_icode in { IMRMOVL, IPOPL } &&
-	 E_dstM in { d_srcA, d_srcB };
+	 E_dstM in { d_srcA, d_srcB } &&
+     !(D_icode in { IRMMOVL, IPUSHL } && D_rB != E_dstM);
 
 bool D_bubble =
 	# Mispredicted branch
 	(E_icode == IJXX && e_Cnd && E_ifun != UNCOND) ||
 	# Stalling at fetch while ret passes through pipeline
 	# but not condition for a load/use hazard
-	!(E_icode in { IMRMOVL, IPOPL } && E_dstM in { d_srcA, d_srcB }) &&
+	!(E_icode in { IMRMOVL, IPOPL } &&
+      E_dstM in { d_srcA, d_srcB } &&
+      !(D_icode in { IRMMOVL, IPUSHL } && D_rB != E_dstM)) &&
 	  IRET in { D_icode, E_icode, M_icode };
 
 # Should I stall or inject a bubble into Pipeline Register E?
@@ -357,7 +362,8 @@ bool E_bubble =
 	(E_icode == IJXX && e_Cnd && E_ifun != UNCOND) ||
 	# Conditions for a load/use hazard
 	E_icode in { IMRMOVL, IPOPL } &&
-	 E_dstM in { d_srcA, d_srcB};
+	 E_dstM in { d_srcA, d_srcB} &&
+     !(D_icode in { IRMMOVL, IPUSHL } && D_rB != E_dstM);
 
 # Should I stall or inject a bubble into Pipeline Register M?
 # At most one of these can be true.
