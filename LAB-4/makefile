@@ -14,13 +14,33 @@ MISC = sum rsum copy
 SEQ = full
 SSIM = sim/seq/ssim
 SEQYO = asumi asuml
+PSIM = sim/pipe/psim
+PIPE = full
+NCOPY = sim/pipe/ncopy.ys
 
 MISCTAR = $(patsubst %, bin/misc/%.yo, $(MISC))
 MISCTEST = $(patsubst %, test/misc/%.yo, $(MISC))
 SEQTAR = sim/seq/seq-$(SEQ).hcl
+PIPETAR = sim/pipe/pipe-$(PIPE).hcl
 SEQTEST = $(patsubst %, test/seq/%.yo, $(SEQYO))
 
-empty:
+empty :
+
+pipe : $(PSIM)
+
+clean-pipe :
+	make -C sim/pipe clean
+
+test-pipe-psim : pipe
+	make -C sim/ptest SIM=../pipe/psim TFLAGS=-i
+
+test-pipe-correctness : pipe
+	(cd sim/pipe; ./correctness.pl -p)
+
+test-pipe-bench : pipe
+	(cd sim/pipe; ./benchmark.pl)
+
+test-pipe : pipe test-pipe-correctness test-pipe-psim test-pipe-bench
 
 seq : $(SSIM)
 
@@ -32,11 +52,16 @@ test-seq-bench : seq
 
 test-seq-small : seq $(SEQTEST)
 
+test-seq : seq test-seq-small test-pipe
+
 misc : $(MISCTAR)
 
 test-misc : misc $(MISCTEST)
 
-.PHONY: misc seq
+.PHONY : misc test-misc seq test-seq-small test-seq-bench pipe empty
+
+$(PSIM) : $(PIPETAR) $(NCOPY)
+	make -C sim/pipe VERSION=$(PIPE)
 
 test/seq/% : sim/y86-code/% seq
 	$(SSIM) -t $< | grep ISA
@@ -44,7 +69,7 @@ test/seq/% : sim/y86-code/% seq
 $(SSIM) : $(SEQTAR)
 	make -C sim/seq VERSION=$(SEQ)
 
-sim/seq/% : src/seq/%
+sim/% : src/%
 	cp $< $@
 
 test/misc/% : bin/misc/%
@@ -82,6 +107,6 @@ handin-partc:
 	tar cf - $(USER)-ncopy.ys $(USER)-pipe-full.hcl > $(USER)-partc.tar
 	rm -f $(USER)-ncopy.ys $(USER)-pipe-full.hcl
 
-clean: clean-seq
+clean: clean-seq clean-pipe
 	rm -f *~ *.o
 	rm -f bin/**/*.yo
