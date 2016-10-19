@@ -37,6 +37,8 @@ test-pipe-psim : pipe
 
 test-pipe-correctness : pipe
 	(cd sim/pipe; ./correctness.pl -p)
+	make -C sim/pipe ncopy.yo
+	sim/pipe/check-len.pl < sim/pipe/ncopy.yo
 
 test-pipe-bench : pipe
 	(cd sim/pipe; ./benchmark.pl)
