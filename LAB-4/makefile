@@ -10,16 +10,39 @@ USER = changeme
 YAS = sim/misc/yas
 YIS = sim/misc/yis
 MISC = sum rsum copy
+
+SEQ = full
+SSIM = sim/seq/ssim
+SEQTEST = asumi asuml
+
 MISCTAR = $(patsubst %, bin/misc/%.yo, $(MISC))
 MISCTEST = $(patsubst %, test/misc/%.yo, $(MISC))
+SEQTAR = sim/seq/seq-$(SEQ).hcl
+SEQTEST = $(patsubst %, test/seq/%.yo, $(SEQTEST))
 
-misc: $(MISCTAR)
+seq : $(SSIM)
 
-test-misc: misc $(MISCTEST)
+clean-seq :
+	make -C sim/seq clean
 
-.PHONY: misc
+test-seq-small : seq $(SEQTESTSMALL)
 
-test/%.yo : bin/%.yo
+misc : $(MISCTAR)
+
+test-misc : misc $(MISCTEST)
+
+.PHONY: misc seq
+
+test/seq/% : sim/y86-code/% seq
+	$(SSIM) -t $<
+
+$(SSIM) : $(SEQTAR)
+	make -C sim/seq VERSION=$(SEQ)
+
+sim/seq/% : src/seq/%
+	cp $< $@
+
+test/misc/% : bin/misc/%
 	$(YIS) $<
 
 bin/%.yo : src/%.yo
@@ -54,6 +77,6 @@ handin-partc:
 	tar cf - $(USER)-ncopy.ys $(USER)-pipe-full.hcl > $(USER)-partc.tar
 	rm -f $(USER)-ncopy.ys $(USER)-pipe-full.hcl
 
-clean:
+clean: clean-seq
 	rm -f *~ *.o
 	rm -f bin/**/*.yo
