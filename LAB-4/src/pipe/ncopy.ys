@@ -24,27 +24,45 @@ ncopy:	pushl %ebp		# Save old frame pointer
 
 
 	xorl %eax,%eax
-    iaddl $-1, %edx
-    jmp Check
 Loop:
-	mrmovl 4(%ebx), %esi
-	rmmovl %esi, 4(%ecx)
+    iaddl $-3, %edx
+    jl EndLoop
+	mrmovl (%ebx), %esi
+	rmmovl %esi, (%ecx)
 	andl %esi, %esi
 	jle L0
 	iaddl $1, %eax
 L0:
-	mrmovl (%ebx), %esi
-	rmmovl %esi, (%ecx)
+	mrmovl 4(%ebx), %esi
+	rmmovl %esi, 4(%ecx)
     andl %esi, %esi
     jle L1
     iaddl $1, %eax
 L1:
-	iaddl $8, %ebx
-	iaddl $8, %ecx
-	iaddl $-2, %edx
-Check:
-	jg Loop
-    jge L0
+    mrmovl 8(%ebx), %esi
+	rmmovl %esi, 8(%ecx)
+    andl %esi, %esi
+    jle L2
+    iaddl $1, %eax
+L2:
+	iaddl $12, %ebx
+	iaddl $12, %ecx
+    jmp Loop
+EndLoop:
+    iaddl $2, %edx
+Loop2:
+    jl EndLoop2
+    mrmovl (%ebx), %esi
+    rmmovl %esi, (%ecx)
+    andl %esi, %esi
+    jle L3
+    iaddl $1, %eax
+L3:
+	iaddl $4, %ebx
+	iaddl $4, %ecx
+	iaddl $-1, %edx
+    jmp Loop2
+EndLoop2:
 
 
 ##################################################################

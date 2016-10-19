@@ -53,6 +53,7 @@ intsig RNONE    'REG_NONE'   	     # Special value indicating "no register"
 
 ##### ALU Functions referenced explicitly ##########################
 intsig ALUADD	'A_ADD'		     # ALU should add its arguments
+intsig UNCOND   'C_YES'
 
 ##### Possible instruction status values                       #####
 intsig SBUB	'STAT_BUB'	# Bubble in stage
@@ -139,7 +140,7 @@ intsig W_valM  'mem_wb_curr->valm'	# Memory M value
 ## What address should instruction be fetched at
 int f_pc = [
 	# Mispredicted branch.  Fetch at incremented PC
-	M_icode == IJXX && !M_Cnd : M_valA;
+	M_icode == IJXX && M_Cnd && M_ifun != UNCOND : M_valA;
 	# Completion of RET instruction.
 	W_icode == IRET : W_valM;
 	# Default: Use predicted value of PC
@@ -182,7 +183,8 @@ bool need_valC =
 
 # Predict next value of PC
 int f_predPC = [
-	f_icode in { IJXX, ICALL } : f_valC;
+	f_icode in { IJXX, ICALL } && f_ifun == UNCOND : f_valC;
+    f_icode == IJXX && f_ifun != UNCOND : f_valP;
 	1 : f_valP;
 ];
 
@@ -219,7 +221,7 @@ int d_dstM = [
 ## What should be the A value?
 ## Forward into decode stage for valA
 int d_valA = [
-	D_icode in { ICALL, IJXX } : D_valP; # Use incremented PC
+	D_icode == ICALL : D_valP; # Use incremented PC
 	d_srcA == e_dstE : e_valE;    # Forward valE from execute
 	d_srcA == M_dstM : m_valM;    # Forward valM from memory
 	d_srcA == M_dstE : M_valE;    # Forward valE from memory
@@ -268,7 +270,10 @@ bool set_cc = E_icode in { IOPL, IIADDL } &&
 	!m_stat in { SADR, SINS, SHLT } && !W_stat in { SADR, SINS, SHLT };
 
 ## Generate valA in execute stage
-int e_valA = E_valA;    # Pass valA through stage
+int e_valA = [
+    E_icode == IJXX && E_ifun != UNCOND : E_valC;
+    1 : E_valA;
+];
 
 ## Set dstE to RNONE in event of not-taken conditional move
 int e_dstE = [
@@ -338,7 +343,7 @@ bool D_stall =
 
 bool D_bubble =
 	# Mispredicted branch
-	(E_icode == IJXX && !e_Cnd) ||
+	(E_icode == IJXX && e_Cnd && E_ifun != UNCOND) ||
 	# Stalling at fetch while ret passes through pipeline
 	# but not condition for a load/use hazard
 	!(E_icode in { IMRMOVL, IPOPL } && E_dstM in { d_srcA, d_srcB }) &&
@@ -349,7 +354,7 @@ bool D_bubble =
 bool E_stall = 0;
 bool E_bubble =
 	# Mispredicted branch
-	(E_icode == IJXX && !e_Cnd) ||
+	(E_icode == IJXX && e_Cnd && E_ifun != UNCOND) ||
 	# Conditions for a load/use hazard
 	E_icode in { IMRMOVL, IPOPL } &&
 	 E_dstM in { d_srcA, d_srcB};
