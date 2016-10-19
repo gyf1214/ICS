@@ -25,7 +25,7 @@ seq : $(SSIM)
 clean-seq :
 	make -C sim/seq clean
 
-test-seq-small : seq $(SEQTESTSMALL)
+test-seq-small : seq $(SEQTEST)
 
 misc : $(MISCTAR)
 
