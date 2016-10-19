@@ -13,12 +13,12 @@ MISC = sum rsum copy
 
 SEQ = full
 SSIM = sim/seq/ssim
-SEQTEST = asumi asuml
+SEQYO = asumi asuml
 
 MISCTAR = $(patsubst %, bin/misc/%.yo, $(MISC))
 MISCTEST = $(patsubst %, test/misc/%.yo, $(MISC))
 SEQTAR = sim/seq/seq-$(SEQ).hcl
-SEQTEST = $(patsubst %, test/seq/%.yo, $(SEQTEST))
+SEQTEST = $(patsubst %, test/seq/%.yo, $(SEQYO))
 
 seq : $(SSIM)
 
@@ -34,7 +34,7 @@ test-misc : misc $(MISCTEST)
 .PHONY: misc seq
 
 test/seq/% : sim/y86-code/% seq
-	$(SSIM) -t $<
+	$(SSIM) -t $< | grep ISA
 
 $(SSIM) : $(SEQTAR)
 	make -C sim/seq VERSION=$(SEQ)
