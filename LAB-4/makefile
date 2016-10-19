@@ -20,6 +20,8 @@ MISCTEST = $(patsubst %, test/misc/%.yo, $(MISC))
 SEQTAR = sim/seq/seq-$(SEQ).hcl
 SEQTEST = $(patsubst %, test/seq/%.yo, $(SEQYO))
 
+empty:
+
 seq : $(SSIM)
 
 clean-seq :
