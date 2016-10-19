@@ -25,6 +25,9 @@ seq : $(SSIM)
 clean-seq :
 	make -C sim/seq clean
 
+test-seq-bench : seq
+	make -C sim/y86-code testssim
+
 test-seq-small : seq $(SEQTEST)
 
 misc : $(MISCTAR)
