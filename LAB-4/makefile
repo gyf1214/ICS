@@ -33,6 +33,7 @@ clean-pipe :
 
 test-pipe-psim : pipe
 	make -C sim/ptest SIM=../pipe/psim TFLAGS=-i
+	make -C sim/y86-code testpsim
 
 test-pipe-correctness : pipe
 	(cd sim/pipe; ./correctness.pl -p)
