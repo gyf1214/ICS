@@ -1,0 +1,62 @@
+Code:
+init:
+    irmovq  Stack, %rsp
+    rrmovq  %rsp, %rbp
+    irmovq  array, %rdi
+    irmovq  8, %rsi
+    call    bubble_a
+    halt
+
+bubble_a:
+	pushq	%rbp
+	rrmovq	%rsp, %rbp
+
+    irmovq  $1, %rdx
+    subq    %rdx, %rsi
+    addq    %rsi, %rsi
+    addq    %rsi, %rsi
+    addq    %rsi, %rsi
+    irmovq  $8, %rdx
+    jmp     C0
+L0:
+    xorq    %r8, %r8
+L1:
+    rrmovq  %r8, %r9
+    addq    %rdi, %r9
+    mrmovq  8(%r9), %rcx
+    mrmovq  (%r9), %r10
+    rrmovq  %rcx, %r11
+    subq    %r10, %r11
+    rrmovq  %rcx, %r11
+    cmovl   %r10, %r11
+    xorq    %r10, %rcx
+    xorq    %r11, %rcx
+    rmmovq  %r11, 8(%r9)
+    rmmovq  %rcx, (%r9)
+    addq    %rdx, %r8
+C1:
+    rrmovq  %r8, %rcx
+    subq    %rsi, %rcx
+    jl      L1
+    subq    %rdx, %rsi
+C0:
+    andq    %rsi, %rsi
+    jg      L0
+
+	popq	%rbp
+	ret
+
+    .align  8
+Data:
+array:
+    .quad   5
+    .quad   6
+    .quad   9
+    .quad   3
+    .quad   7
+    .quad   0
+    .quad   4
+    .quad   1
+
+    .pos    0x100
+Stack:
