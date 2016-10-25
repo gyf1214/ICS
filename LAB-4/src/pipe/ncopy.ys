@@ -1,3 +1,35 @@
+#	begin comment
+##################################################################
+#	ID: 1500012706												 #
+##################################################################
+#	1. Use iaddl												 #
+##################################################################
+#	Of course it is much faster than irmovl & addl, and I		 #
+#	implemented it in the pipeline								 #
+#																 #
+##################################################################
+#	2. Expand the loop with k = 4								 #
+##################################################################
+#	Expand the loop can significantly reduce the number of		 #
+#	instructions at the end of the loop. (i.e. changing len--	 #
+#	to len -= 4, src++ to src += 4, dst++ to dst += 4)			 #
+#																 #
+#	Expanding with k = 3 doesn't pass the test with 60/60, so	 #
+#	I use k = 4.												 #
+#																 #
+##################################################################
+#	3. Change all loops to until loop							 #
+##################################################################
+#	At first I find it can reduce the number of instructions,	 #
+#	but it is not compatible with the Taken policy of branch	 #
+#	prediction in pipeline. So I also change the policy of		 #
+#	branch prediction to Not Taken.								 #
+#																 #
+#	Then I find it unnecessary.									 #
+#																 #
+##################################################################
+#	end comment
+
 #/* $begin ncopy-ys */
 ##################################################################
 # ncopy.ys - Copy a src block of len ints to dst.
