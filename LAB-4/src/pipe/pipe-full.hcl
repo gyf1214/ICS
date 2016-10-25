@@ -1,3 +1,60 @@
+#	begin comment
+####################################################################
+#   ID: 1500012706                                                 #
+####################################################################
+#   1. Implement iaddl                                             #
+####################################################################
+#   Just the same change as SEQ.                                   #
+#                                                                  #
+#   It's much faster than irmovl & addl.                           #
+#                                                                  #
+####################################################################
+#   2. Change branch prediction policy to NT (Not Taken)           #
+####################################################################
+#   It's very complicated.                                         #
+#                                                                  #
+#   First NT policy should exclude the unconditional jump & call,  #
+#   and fortunately we can judge by ifunc == UNCOND.               #
+#                                                                  #
+#   In Fetch Stage, I modify the f_pc & f_predPC. Note that if     #
+#   misprediction is detected, the conditional jump instruction    #
+#   should be at Memory Stage.                                     #
+#                                                                  #
+#   To use the NT policy, we must pass the conditional jump        #
+#   address to Memory Stage, since if misprediction happens, Fetch #
+#   Stage should get the right address of new PC. In Decode Stage, #
+#   the jump address is stored in valC, so in Execute Stage I      #
+#   forward it to the output of valA (e_valA). So in Fetch Stage   #
+#   the f_pc should be M_valA if misprediction happens.            #
+#                                                                  #
+#   Nothing changed in Decode, Memory and Write Back Stage.        #
+#                                                                  #
+#   Since my ncopy.ys changes all while loops to until loops, NT   #
+#   policy is much faster when there is much more conditional      #
+#   jumps that are not taken.                                      #
+#                                                                  #
+####################################################################
+#   3. Implement load forwarding (Homework 4.57)                   #
+####################################################################
+#   In load hazard, there is a situation that doesn't cause a      #
+#   hazard. That is, when then instruction after the load          #
+#   instruction is a store instruction (rmmovl or pushl). Since    #
+#   the register used in the load instruction doesn't takes part   #
+#   in the Execute Stage, it doesn't need to be read in Decode     #
+#   Stage. Instead, we can forward from Memory Stage to Execute    #
+#   Stage.                                                         #
+#                                                                  #
+#   First, the condition of load forwarding is:                    #
+#       D_icode in {IRMMOVL, IPUSHL} && D_rB != E_dstM             #
+#                                                                  #
+#   Second, forward is from m_valM to e_valA.                      #
+#                                                                  #
+#   Since the ncopy.ys uses mrmovl + rmmovl to copy data, load     #
+#   forwarding can significantly speed the code up.                #
+#                                                                  #
+####################################################################
+#   end comment
+
 #/* $begin pipe-all-hcl */
 ####################################################################
 #    HCL Description of Control for Pipelined Y86 Processor        #

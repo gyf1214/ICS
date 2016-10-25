@@ -1,3 +1,34 @@
+#	begin comment
+####################################################################
+#	ID: 1500012705												   #
+####################################################################
+#	Procedure of iaddl											   #
+####################################################################
+#	Stage			#	Operation								   #
+#	Fetch			#	icode:ifunc	<- M1[PC]					   #
+#					#	rA:rB		<- M1[PC + 1]				   #
+#					#	valC		<- M4[PC + 2]				   #
+#					#	valP		<- PC + 6					   #
+#	Decode			#	valB		<- R[rB]					   #
+#	Execute			#	valE		<- valC + valB				   #
+#					#	Set	CC
+#	Memory			#	/* nop */								   #
+#	Write Back		#	R[rB]	 	<- valE						   #
+#	Update PC		#	PC			<- valP						   #
+####################################################################
+#	Procedure of leave											   #
+####################################################################
+#	Stage			#	Operation								   #
+#	Fetch			#	icode:ifunc	<- M1[PC]					   #
+#					#	valP		<- PC + 1					   #
+#	Decode			#	valA		<- r[EBP]					   #
+#	Execute			#	valE		<- valA + 4					   #
+#	Memory			#	r[EBP]		<- M4[valA]					   #
+#	Write Back		#	r[ESP]		<- valE						   #
+#	Update PC		#	PC			<- valP						   #
+####################################################################
+#	end comment
+
 #/* $begin seq-all-hcl */
 ####################################################################
 #  HCL Description of Control for Single Cycle Y86 Processor SEQ   #
@@ -126,6 +157,7 @@ bool need_valC =
 int srcA = [
 	icode in { IRRMOVL, IRMMOVL, IOPL, IPUSHL  } : rA;
 	icode in { IPOPL, IRET } : RESP;
+    icode == ILEAVE : REBP;
 	1 : RNONE; # Don't need register
 ];
 
@@ -133,7 +165,6 @@ int srcA = [
 int srcB = [
 	icode in { IOPL, IRMMOVL, IMRMOVL, IIADDL } : rB;
 	icode in { IPUSHL, IPOPL, ICALL, IRET } : RESP;
-    icode == ILEAVE : REBP;
 	1 : RNONE;  # Don't need register
 ];
 
@@ -156,17 +187,18 @@ int dstM = [
 
 ## Select input A to ALU
 int aluA = [
-	icode in { IRRMOVL, IOPL } : valA;
+	icode in { IRRMOVL, IOPL, ILEAVE } : valA;
 	icode in { IIRMOVL, IRMMOVL, IMRMOVL, IIADDL } : valC;
 	icode in { ICALL, IPUSHL } : -4;
-	icode in { IRET, IPOPL, ILEAVE } : 4;
+	icode in { IRET, IPOPL } : 4;
 	# Other instructions don't need ALU
 ];
 
 ## Select input B to ALU
 int aluB = [
 	icode in { IRMMOVL, IMRMOVL, IOPL, ICALL,
-		      IPUSHL, IRET, IPOPL, IIADDL, ILEAVE } : valB;
+		      IPUSHL, IRET, IPOPL, IIADDL } : valB;
+	icode == ILEAVE : 4;
 	icode in { IRRMOVL, IIRMOVL } : 0;
 	# Other instructions don't need ALU
 ];
@@ -191,8 +223,7 @@ bool mem_write = icode in { IRMMOVL, IPUSHL, ICALL };
 ## Select memory address
 int mem_addr = [
 	icode in { IRMMOVL, IPUSHL, ICALL, IMRMOVL } : valE;
-	icode in { IPOPL, IRET } : valA;
-    icode == ILEAVE : valB;
+	icode in { IPOPL, IRET, ILEAVE } : valA;
 	# Other instructions don't need address
 ];
 

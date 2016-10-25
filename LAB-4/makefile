@@ -51,11 +51,12 @@ clean-seq :
 	make -C sim/seq clean
 
 test-seq-bench : seq
+	make -C sim/ptest SIM=../seq/ssim TFLAGS=-il
 	make -C sim/y86-code testssim
 
 test-seq-small : seq $(SEQTEST)
 
-test-seq : seq test-seq-small test-pipe
+test-seq : seq test-seq-small test-seq-bench
 
 misc : $(MISCTAR)
 
