@@ -15,17 +15,16 @@ void trans(int M, int N, int A[N][M], int B[M][N]) {
     }
 }
 
-#define BLOCK 256
+#define BLOCK 8
 
 char trans1_desc[] = "Ver 1.0";
 void trans1(int M, int N, int A[N][M], int B[M][N]) {
-    int size = BLOCK / N;
-    int bm = M / size, bn = N / size;
+    int bm = M / BLOCK, bn = N / BLOCK;
     int i, j, bi, bj;
     for (bi = 0; bi < bn; ++bi) {
         for (bj = 0; bj < bm; ++bj) {
-            for (i = bi * size; i < bi * size + size; ++i) {
-                for (j = bj * size; j < bj * size + size; ++j) {
+            for (i = bi * BLOCK; i < bi * BLOCK + BLOCK; ++i) {
+                for (j = bj * BLOCK; j < bj * BLOCK + BLOCK; ++j) {
                     B[j][i] = A[i][j];
                 }
             }
