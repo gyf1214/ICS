@@ -4,6 +4,8 @@
 CC = gcc
 CFLAGS = -g -Wall -Werror -std=c99
 
+default: test-trans tracegen
+
 test-csim: csim
 	./test-csim
 
