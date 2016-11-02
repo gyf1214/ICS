@@ -1,3 +1,8 @@
 .csim_*
 csim
 *.dSYM
+test-trans
+tracegen
+tracegen-ct
+trace.*
+*.o
