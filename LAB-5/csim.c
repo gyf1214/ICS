@@ -7,7 +7,7 @@
 
 typedef struct {
     char valid;
-    unsigned tag;
+    unsigned long tag;
     int dirty;
 } Line;
 
@@ -30,7 +30,7 @@ void freeSet() {
     cache = NULL;
 }
 
-void load(unsigned set, unsigned tag) {
+void load(unsigned long set, unsigned long tag) {
     int l, recent = infi;
     Line *now;
     for (int i = 0; i < E; ++i) {
@@ -53,9 +53,9 @@ void load(unsigned set, unsigned tag) {
     now -> dirty = clock;
 }
 
-void access(unsigned address) {
-    unsigned tag = address >> (s + b);
-    unsigned set = (address >> b) & ((1 << s) - 1);
+void access(unsigned long address) {
+    unsigned long tag = address >> (s + b);
+    unsigned long set = (address >> b) & ((1 << s) - 1);
     int i;
     char hit = 0;
     for (i = 0; i < E; ++i) {
@@ -116,10 +116,10 @@ void work() {
     char buf[256];
     while (fgets(buf, 256, in)) {
         if (buf[0] == ' ') {
-            unsigned address, nothing;
+            unsigned long address, nothing;
             char x;
-            sscanf(buf + 1, "%c %x,%d", &x, &address, &nothing);
-            if (vv) printf("%c %x,%d", x, address, nothing);
+            sscanf(buf + 1, "%c %lx,%ld", &x, &address, &nothing);
+            if (vv) printf("%c %lx,%ld", x, address, nothing);
             access(address);
             if (x == 'M') access(address);
             if (vv) printf("\n");
