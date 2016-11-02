@@ -1,3 +1,5 @@
+empty :
+
 lf : sim/pipe/pipe-lf.hcl
 	make -C sim/pipe clean
 	make -C sim/pipe psim VERSION=lf
