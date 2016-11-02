@@ -18,7 +18,7 @@ char vv;
 
 FILE *in;
 
-#define line(i, j) (cache + i * E + j)
+#define line(i, j) (cache + (i) * E + (j))
 
 void initSet() {
     cache = malloc(sizeof(Line) * (1 << s) * E);
@@ -61,6 +61,7 @@ void access(unsigned address) {
     for (i = 0; i < E; ++i) {
         Line *now = line(set, i);
         if (now -> valid && now -> tag == tag) {
+            now -> dirty = clock;
             hit = 1;
             break;
         }
@@ -76,6 +77,7 @@ int pre(int argc, char **argv) {
     const char *path = NULL;
     int i;
     s = b = E = 0;
+    clock = 0;
     for (i = 1; i < argc; ++i) {
         if (argv[i][0] == '-') {
             switch (argv[i][1]) {
