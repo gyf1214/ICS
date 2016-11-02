@@ -15,7 +15,7 @@ void trans(int M, int N, int A[N][M], int B[M][N]) {
     }
 }
 
-#define BLOCK 256
+#define BLOCK 128
 
 char trans1_desc[] = "Ver 1.0";
 void trans1(int M, int N, int A[N][M], int B[M][N]) {
