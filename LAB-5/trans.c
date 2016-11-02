@@ -26,7 +26,9 @@ void trans1(int M, int N, int A[N][M], int B[M][N]) {
         for (bj = 0; bj < bm; ++bj) {
             for (i = bi * size; i < bi * size + size; ++i) {
                 for (j = bj * size; j < bj * size + size; ++j) {
-                    A[i][j] = B[j][i];
+                    if (i != j) {
+                        A[i][j] = B[j][i];
+                    }
                 }
             }
         }
