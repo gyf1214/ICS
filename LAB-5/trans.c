@@ -32,7 +32,7 @@ void trans1(int M, int N, int A[N][M], int B[M][N]) {
     int i, j;
     for (i = 0; i < b; ++i) {
         for (j = 0; j < b; ++j) {
-            transBlock(M, N, A, B, i, (j + i) % b, BLOCK);
+            transBlock(M, N, A, B, (i + j) % b, j, BLOCK);
         }
     }
 }
