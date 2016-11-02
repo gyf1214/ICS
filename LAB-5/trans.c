@@ -37,5 +37,4 @@ void registerFunctions()
 {
     registerTransFunction(trans, trans_desc);
     registerTransFunction(trans1, trans1_desc);
-    registerTransFunction(trans1, transpose_submit_desc);
 }
