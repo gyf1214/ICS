@@ -6,3 +6,4 @@ tracegen
 tracegen-ct
 trace.*
 *.o
+.marker
