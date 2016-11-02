@@ -1,17 +1,19 @@
 #
 # Student makefile for Cache Lab
-# 
+#
 CC = gcc
 CFLAGS = -g -Wall -Werror -std=c99
 
+empty:
+
 all: csim test-trans tracegen
-	-tar -cvf ${USER}_handin.tar  csim.c trans.c 
+	-tar -cvf ${USER}_handin.tar  csim.c trans.c
 
 csim: csim.c cachelab.c cachelab.h
-	$(CC) $(CFLAGS) -o csim csim.c cachelab.c -lm 
+	$(CC) $(CFLAGS) -o csim csim.c cachelab.c -lm
 
 test-trans: test-trans.c trans.o cachelab.c cachelab.h
-	$(CC) $(CFLAGS) -o test-trans test-trans.c cachelab.c trans.o 
+	$(CC) $(CFLAGS) -o test-trans test-trans.c cachelab.c trans.o
 
 tracegen-ct: tracegen-ct.c trans.c cachelab.c
 	clang -emit-llvm -S -O3 trans.c -o trans.bc
