@@ -39,4 +39,4 @@ clean:
 	rm -f csim
 	rm -f test-trans tracegen tracegen-ct
 	rm -f trace.all trace.f*
-	rm -f .csim_results .marker
+	rm -f .csim_* .marker
