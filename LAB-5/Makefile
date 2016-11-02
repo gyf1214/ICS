@@ -4,6 +4,13 @@
 CC = gcc
 CFLAGS = -g -Wall -Werror -std=c99
 
+BATCH = .tests
+RESULT = .csim_results
+ANSWER = .csim_answer
+
+test-csim: csim
+	cat $(BATCH) | while read line; do ./csim-ref $$line; mv $(RESULT) $(ANSWER); ./csim $$line; diff $(RESULT) $(ANSWER); done
+
 empty:
 
 all: csim test-trans tracegen
