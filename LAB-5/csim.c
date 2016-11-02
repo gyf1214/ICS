@@ -4,6 +4,7 @@
 #include "cachelab.h"
 
 #define infi 0x7FFFFFFF
+#define line(i, j) (cache + (i) * E + (j))
 
 typedef struct {
     char valid;
@@ -17,8 +18,6 @@ int hits, misses, evictions;
 char vv;
 
 FILE *in;
-
-#define line(i, j) (cache + (i) * E + (j))
 
 void initSet() {
     cache = malloc(sizeof(Line) * (1 << s) * E);
