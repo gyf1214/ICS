@@ -1,0 +1,192 @@
+<?xml version="1.0" standalone="no"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="1000" height="840">
+    <defs>
+        <rect id="reg-box" width="90" height="30" style="stroke: black; stroke-opacity: 1; stroke-width: 1; fill: none" />
+        <rect id="opt-box" width="90" height="45" rx="10" ry="10" style="stroke: black; stroke-opacity: 1; stroke-width: 1; fill: none" />
+        <path id="marker" d="M-10 -5 L0 0 L-10 5 L-8 0 Z" style="stroke: none; fill: black" />
+        <g id="a-reg-boxes">
+            <g transform="translate(0, 0)">
+                <use xlink:href="#reg-box" />
+                <text text-anchor="middle" x="45" y="20">%rax</text>
+            </g>
+            <g transform="translate(90, 0)">
+                <use xlink:href="#reg-box" />
+                <text text-anchor="middle" x="45" y="20">%rbp</text>
+            </g>
+            <g transform="translate(180, 0)">
+                <use xlink:href="#reg-box" />
+                <text text-anchor="middle" x="45" y="20">%rbx</text>
+            </g>
+            <g transform="translate(270, 0)">
+                <use xlink:href="#reg-box" />
+                <text text-anchor="middle" x="45" y="20">%rcx</text>
+            </g>
+            <g transform="translate(360, 0)">
+                <use xlink:href="#reg-box" />
+                <text text-anchor="middle" x="45" y="20">%xmm0</text>
+            </g>
+            <g transform="translate(450, 0)">
+                <use xlink:href="#reg-box" />
+                <text text-anchor="middle" x="45" y="20">%xmm1</text>
+            </g>
+        </g>
+        <g id="a-opt-boxes">
+            <g transform="translate(0, 0)">
+                <use xlink:href="#opt-box" />
+                <text text-anchor="middle" x="45" y="28">load</text>
+            </g>
+            <g transform="translate(0, 45)">
+                <use xlink:href="#opt-box" />
+                <text text-anchor="middle" x="45" y="28">load</text>
+            </g>
+            <g transform="translate(0, 90)">
+                <use xlink:href="#opt-box" />
+                <text text-anchor="middle" x="45" y="28">mul</text>
+            </g>
+            <g transform="translate(0, 135)">
+                <use xlink:href="#opt-box" />
+                <text text-anchor="middle" x="45" y="28">add</text>
+            </g>
+            <g transform="translate(0, 180)">
+                <use xlink:href="#opt-box" />
+                <text text-anchor="middle" x="45" y="28">add</text>
+            </g>
+            <g transform="translate(0, 225)">
+                <use xlink:href="#opt-box" />
+                <text text-anchor="middle" x="45" y="28">cmp</text>
+            </g>
+            <g transform="translate(0, 270)">
+                <use xlink:href="#opt-box" />
+                <text text-anchor="middle" x="45" y="28">jne</text>
+            </g>
+        </g>
+        <g id="b-reg-boxes">
+            <g transform="translate(0, 0)">
+                <use xlink:href="#reg-box" />
+                <text text-anchor="middle" x="45" y="20">%rcx</text>
+            </g>
+            <g transform="translate(450, 0)">
+                <use xlink:href="#reg-box" />
+                <text text-anchor="middle" x="45" y="20">%xmm0</text>
+            </g>
+        </g>
+        <g id="b-opt-boxes">
+            <g transform="translate(300, 90)">
+                <use xlink:href="#opt-box" />
+                <text text-anchor="middle" x="45" y="28">load</text>
+            </g>
+            <g transform="translate(0, 195)">
+                <use xlink:href="#opt-box" />
+                <text text-anchor="middle" x="45" y="28">add</text>
+            </g>
+            <g transform="translate(150, 195)">
+                <use xlink:href="#opt-box" />
+                <text text-anchor="middle" x="45" y="28">load</text>
+            </g>
+            <g transform="translate(300, 195)">
+                <use xlink:href="#opt-box" />
+                <text text-anchor="middle" x="45" y="28">mul</text>
+            </g>
+            <g transform="translate(450, 195)">
+                <use xlink:href="#opt-box" />
+                <text text-anchor="middle" x="45" y="28">add</text>
+            </g>
+        </g>
+    </defs>
+    <rect id="fill" x="0" y="0" width="1000" height="840" style="stroke: none; fill: white" />
+    <g id="a" transform="translate(10, 10)">
+        <g id="a-boxes">
+            <use transform="translate(0, 0)" xlink:href="#a-reg-boxes" />
+            <use transform="translate(0, 405)" xlink:href="#a-reg-boxes" />
+            <use transform="translate(570, 60)" xlink:href="#a-opt-boxes" />
+        </g>
+        <g id="a-comment" transform="translate(700, 60)">
+            <text text-anchor="left" y="28">vmovsd (%rbp, %rcx, 8), %xmm1</text>
+            <text text-anchor="left" y="96">vmulsd (%rax, %rcx, 8), %xmm1, %xmm1</text>
+            <text text-anchor="left" y="163">vaddsd %xmm1, %xmm0, %xmm0</text>
+            <text text-anchor="left" y="208">addq $1, %rcx</text>
+            <text text-anchor="left" y="253">cmpq %rbx, %rcx</text>
+            <text text-anchor="left" y="298">jne .L15</text>
+        </g>
+        <g id="a-lines">
+            <path id="verticle" style="stroke: black; stroke-opacity: 1; fill: none" d="
+                M45 30 l0 375
+                M135 30 l0 375
+                M225 30 l0 375
+                M315 30 l0 225 m0 15 l0 135
+                M405 30 l0 188 m0 11 l0 176
+                M495 94 l0 71 m0 15 l0 225
+                " />
+            <path id="horizon" style="stroke: black; stroke-opacity: 1; fill: none" d="
+                M135 72 L570 72
+                M315 83 L570 83
+                M495 94 L570 94
+                M45 120 L570 120
+                M315 135 L570 135
+                M495 165 L570 165
+                M495 180 L570 180
+                M495 207 L570 207
+                M405 218 L570 218
+                M405 229 L570 229
+                M315 255 L570 255
+                M315 270 L570 270
+                M225 300 L570 300
+                M315 315 L570 315
+                " />
+            <path id="curve" style="stroke: black; stroke-opacity: 1; fill: none" d="
+                M660 128 c25 0, 25 45, 0 45
+                M660 308 c25 0, 25 45, 0 45
+                " />
+        </g>
+        <g id="a-arrows">
+            <use xlink:href="#marker" transform="translate(45, 405) rotate(90)"/>
+            <use xlink:href="#marker" transform="translate(135, 405) rotate(90)"/>
+            <use xlink:href="#marker" transform="translate(225, 405) rotate(90)"/>
+            <use xlink:href="#marker" transform="translate(315, 405) rotate(90)"/>
+            <use xlink:href="#marker" transform="translate(405, 405) rotate(90)"/>
+            <use xlink:href="#marker" transform="translate(495, 405) rotate(90)"/>
+            <use xlink:href="#marker" transform="translate(570, 72)"/>
+            <use xlink:href="#marker" transform="translate(570, 83)"/>
+            <use xlink:href="#marker" transform="translate(570, 120)"/>
+            <use xlink:href="#marker" transform="translate(570, 135)"/>
+            <use xlink:href="#marker" transform="translate(570, 165)"/>
+            <use xlink:href="#marker" transform="translate(570, 207)"/>
+            <use xlink:href="#marker" transform="translate(570, 218)"/>
+            <use xlink:href="#marker" transform="translate(570, 255)"/>
+            <use xlink:href="#marker" transform="translate(570, 300)"/>
+            <use xlink:href="#marker" transform="translate(570, 315)"/>
+            <use xlink:href="#marker" transform="translate(660, 173) rotate(165)"/>
+            <use xlink:href="#marker" transform="translate(660, 353) rotate(165)"/>
+        </g>
+    </g>
+    <g id="b" transform="translate(10, 500)">
+        <g id="b-boxes">
+            <use transform="translate(0, 0)" xlink:href="#b-reg-boxes" />
+            <use transform="translate(0, 0)" xlink:href="#b-opt-boxes" />
+            <use transform="translate(0, 300)" xlink:href="#b-reg-boxes" />
+        </g>
+        <g id="a-lines">
+            <path style="stroke: black; stroke-opacity: 1; stroke-width: 1; fill: none" d="
+                M45 30 l0 165 m0 45 l0 60
+                M345 135 l0 60
+                M195 113 l0 82
+                M45 113 l255 0
+                M240 218 l60 0 m90 0 l60 0
+                " />
+            <path style="stroke: black; stroke-opacity: 1; stroke-width: 3; fill: none" d="
+                M495 30 l0 160 m0 50 l0 55
+                " />
+        </g>
+        <g id="a-arrows">
+            <use xlink:href="#marker" transform="translate(45, 195) rotate(90)"/>
+            <use xlink:href="#marker" transform="translate(45, 300) rotate(90)"/>
+            <use xlink:href="#marker" transform="translate(195, 195) rotate(90)"/>
+            <use xlink:href="#marker" transform="translate(345, 195) rotate(90)"/>
+            <use xlink:href="#marker" transform="translate(495, 195) rotate(90)"/>
+            <use xlink:href="#marker" transform="translate(495, 300) rotate(90)"/>
+            <use xlink:href="#marker" transform="translate(300, 218)"/>
+            <use xlink:href="#marker" transform="translate(450, 218)"/>
+        </g>
+    </g>
+</svg>
