@@ -14,6 +14,8 @@ empty:
 all: csim test-trans tracegen
 	-tar -cvf ${USER}_handin.tar  csim.c trans.c
 
+tsim: trans.o tsim.o
+
 csim: csim.c cachelab.c cachelab.h
 	$(CC) $(CFLAGS) -o csim csim.c cachelab.c -lm
 

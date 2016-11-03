@@ -7,3 +7,4 @@ tracegen-ct
 trace.*
 *.o
 .marker
+tsim
