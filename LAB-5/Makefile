@@ -3,8 +3,17 @@
 #
 CC = gcc
 CFLAGS = -g -Wall -Werror -std=c99
+M = 32
+N = 32
+SIMFLAG = -v -s 5 -E 1 -b 5
+TRACE = trace.f0
+TRACETAR = trace.ff0
 
-default: test-trans tracegen
+test-trans-all: trans
+	./test-trans -M $(M) -N $(N)
+	./csim-ref $(SIMFLAG) -t $(TRACE) > $(TRACETAR)
+
+trans: test-trans tracegen
 
 test-csim: csim
 	./test-csim

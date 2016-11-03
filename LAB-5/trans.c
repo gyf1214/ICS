@@ -63,7 +63,7 @@ void trans64(int M, int N, int A[N][M], int B[M][N]) {
 
 void registerFunctions()
 {
+    registerTransFunction(trans64, desc64);
     registerTransFunction(trans, trans_desc);
     registerTransFunction(trans32, desc32);
-    registerTransFunction(trans64, desc64);
 }
