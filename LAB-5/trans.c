@@ -28,7 +28,7 @@ void transBlock(int M, int N, int A[N][M], int B[M][N], int bi, int bj, int bloc
 
 char trans1_desc[] = "Ver 1.0";
 void trans1(int M, int N, int A[N][M], int B[M][N]) {
-    int i, j, k;
+    int i, j;
     for (i = 0; i < N; i += BLOCK) {
         for (j = 0; j < M; j += BLOCK) {
             if (i != j) {
