@@ -23,7 +23,7 @@ void print(int A[][SIZE]) {
 int main() {
     int i, j;
     rep(i) rep(j) {
-        A[i][j] = i * SIZE + j;
+        A[i][j] = (i * SIZE + j) % 1000;
     }
     print(A);
     trans64(SIZE, SIZE, A, B);
