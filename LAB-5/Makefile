@@ -3,8 +3,8 @@
 #
 CC = gcc
 CFLAGS = -g -Wall -Werror -std=c99
-M = 32
-N = 32
+M = 64
+N = 64
 SIMFLAG = -v -s 5 -E 1 -b 5
 TRACE = trace.f0
 TRACETAR = trace.ff0
