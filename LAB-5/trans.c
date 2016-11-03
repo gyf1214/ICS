@@ -50,12 +50,15 @@ void transHalf(int M, int N, int A[N][M], int B[M][N], int bi, int bj, int t) {
 
 char desc64[] = "For 64x64";
 void trans64(int M, int N, int A[N][M], int B[M][N]) {
-    int i, j;
+    int i, j, k;
     iteBLOCK(i, 1, N) iteBLOCK(j, 1, M) if (i != j) transHalf(M, N, A, B, i, j, 0);
     iteBLOCK(i, 2, N) transHalf(M, N, A, B, i, 0, 1);
     iteBLOCK(j, 2, N) transHalf(M, N, A, B, 0, j, 1);
     transHalf(M, N, A, B, 1, 0, 2);
     transHalf(M, N, A, B, 0, 1, 2);
+    iteBLOCK(k, 0, N) {
+        repBLOCK(i, j, k, k) B[j][i] = A[i][j];
+    }
 }
 
 void registerFunctions()
