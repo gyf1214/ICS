@@ -17,22 +17,25 @@ void trans(int M, int N, int A[N][M], int B[M][N]) {
 
 #define BLOCK 8
 
-void transBlock(int M, int N, int A[N][M], int B[M][N], int bi, int bj, int block) {
+void transBlock(int M, int N, int A[N][M], int B[M][N], int bi, int bj, int block, int offset) {
     int i, j;
-    for (i = bi * block; i < bi * block + block; ++i) {
-        for (j = bj * block; j < bj * block + block; ++j) {
-            B[j][i] = A[i][j];
+    for (i = bi; i < bi + block; ++i) {
+        for (j = bj; j < bj + block; ++j) {
+            B[j][i] = A[(i + offset) % N][(j + offset) % M];
         }
     }
 }
 
 char trans1_desc[] = "Ver 1.0";
 void trans1(int M, int N, int A[N][M], int B[M][N]) {
-    int b = M / BLOCK;
-    int i, j;
-    for (i = 0; i < b; ++i) {
-        for (j = 0; j < b; ++j) {
-            transBlock(M, N, A, B, i, j, BLOCK);
+    int i, j, k;
+    for (i = 0; i < N; i += BLOCK) {
+        for (j = 0; j < M; j += BLOCK) {
+            if (i != j) {
+                transBlock(M, N, A, B, i, j, BLOCK, 0);
+            } else {
+                transBlock(M, N, A, B, i, j, BLOCK, 0);
+            }
         }
     }
 }
