@@ -55,4 +55,5 @@ clean:
 	rm -f test-trans tracegen tracegen-ct
 	rm -f trace.all trace.f*
 	rm -f .csim_* .marker
+	rm -f *.tmp tsim
 	rm -rf *.dSYM
