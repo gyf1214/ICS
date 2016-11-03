@@ -29,6 +29,11 @@ void transBlock(int M, int N, int A[N][M], int B[M][N], int bi, int bj, int bloc
 char trans1_desc[] = "Ver 1.0";
 void trans1(int M, int N, int A[N][M], int B[M][N]) {
     int i, j, k;
+    for (i = 0; i < BLOCK; ++i) {
+        for (j = 0; j < BLOCK; ++j) {
+            B[j][i] = A[i][j];
+        }
+    }
     for (k = BLOCK; k < N; k += BLOCK) {
         for (i = 0; i < BLOCK; ++i) {
             for (j = 0; j < BLOCK; ++j) {
