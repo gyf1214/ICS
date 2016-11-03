@@ -52,10 +52,10 @@ char desc64[] = "For 64x64";
 void trans64(int M, int N, int A[N][M], int B[M][N]) {
     int i, j, k;
     iteBLOCK(i, 1, N) iteBLOCK(j, 1, M) if (i != j) transHalf(M, N, A, B, i, j, 0);
-    iteBLOCK(i, 2, N) transHalf(M, N, A, B, i, 0, 1);
-    iteBLOCK(j, 2, M) transHalf(M, N, A, B, 0, j, 1);
-    transHalf(M, N, A, B, BLOCK, 0, 2);
-    transHalf(M, N, A, B, 0, BLOCK, 2);
+    iteBLOCK(i, 2, N) transHalf(M, N, A, B, i, 0, BLOCK);
+    iteBLOCK(j, 2, M) transHalf(M, N, A, B, 0, j, BLOCK);
+    transHalf(M, N, A, B, BLOCK, 0, 2 * BLOCK);
+    transHalf(M, N, A, B, 0, BLOCK, 2 * BLOCK);
     iteBLOCK(k, 0, N) {
         repBLOCK(i, j, k, k) B[j][i] = A[i][j];
     }
