@@ -13,10 +13,12 @@ test-trans-all: trans
 	./test-trans -M $(M) -N $(N)
 	./csim-ref $(SIMFLAG) -t $(TRACE) > $(TRACETAR)
 
-trans: test-trans tracegen
+trans-all: test-trans tracegen
 
 test-csim: csim
 	./test-csim
+
+.PHONY: empty all test-csim trans-all test-trans-all
 
 empty:
 
