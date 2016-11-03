@@ -86,7 +86,7 @@ void transMain(int M, int N, int A[N][M], int B[M][N]) {
     } else if (M == 64) {
         trans64(M, N, A, B);
     } else {
-        trans32(M, N, A, B);
+        trans(M, N, A, B);
     }
 }
 
