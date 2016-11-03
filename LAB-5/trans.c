@@ -80,8 +80,19 @@ void trans64(int M, int N, int A[N][M], int B[M][N]) {
     repBLOCK(BLOCK * 2, BLOCK * 2) B[j][i] = A[i][j];
 }
 
+void transMain(int M, int N, int A[N][M], int B[M][N]) {
+    if (M == 32) {
+        trans32(M, N, A, B);
+    } else if (M == 64) {
+        trans64(M, N, A, B);
+    } else {
+        trans32(M, N, A, B);
+    }
+}
+
 void registerFunctions()
 {
+    registerTransFunction(transMain, transpose_submit_desc);
     registerTransFunction(trans64, desc64);
     registerTransFunction(trans, trans_desc);
     registerTransFunction(trans32, desc32);
