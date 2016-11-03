@@ -17,24 +17,34 @@ void trans(int M, int N, int A[N][M], int B[M][N]) {
 
 #define BLOCK 8
 
-void transBlock(int M, int N, int A[N][M], int B[M][N], int bi, int bj, int block, int offset) {
+void transBlock(int M, int N, int A[N][M], int B[M][N], int bi, int bj, int block) {
     int i, j;
     for (i = bi; i < bi + block; ++i) {
         for (j = bj; j < bj + block; ++j) {
-            B[j][i] = A[(i + offset) % N][(j + offset) % M];
+            B[j][i] = A[i][j];
         }
     }
 }
 
 char trans1_desc[] = "Ver 1.0";
 void trans1(int M, int N, int A[N][M], int B[M][N]) {
-    int i, j;
+    int i, j, k;
+    for (k = BLOCK; k < N; k += BLOCK) {
+        for (i = 0; i < BLOCK; ++i) {
+            for (j = 0; j < BLOCK; ++j) {
+                B[j][i] = A[i + k][j + k];
+            }
+        }
+        for (i = 0; i < BLOCK; ++i) {
+            for (j = 0; j < BLOCK; ++j) {
+                B[i + k][j + k] = B[i][j];
+            }
+        }
+    }
     for (i = 0; i < N; i += BLOCK) {
         for (j = 0; j < M; j += BLOCK) {
             if (i != j) {
-                transBlock(M, N, A, B, i, j, BLOCK, 0);
-            } else {
-                transBlock(M, N, A, B, i, j, BLOCK, 0);
+                transBlock(M, N, A, B, i, j, BLOCK);
             }
         }
     }
