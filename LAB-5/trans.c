@@ -17,23 +17,25 @@ void trans(int M, int N, int A[N][M], int B[M][N]) {
 
 #define BLOCK 8
 #define HALF BLOCK / 2
-#define repBLOCK(i, j, bi, bj) for (i = bi; i < bi + BLOCK; ++i) for (j = bj; j < bj + BLOCK; ++j)
-#define iteBLOCK(i, bi, N) for (i = bi * BLOCK; i < N; i += BLOCK)
-#define repHALF(i, j, bi, bj) for (i = bi; i < bi + HALF; ++i) for (j = bj; j < bj + HALF; ++j)
+#define repBLOCK(bi, bj) for (i = (bi); i < (bi) + BLOCK; ++i) for (j = (bj); j < (bj) + BLOCK; ++j)
+#define iteBLOCK(i, bi, N) for (i = (bi) * BLOCK; i < (N); i += BLOCK)
+#define repHALF(bi, bj) for (i = (bi); i < (bi) + HALF; ++i) for (j = (bj); j < (bj) + HALF; ++j)
+#define transQUAD(b1, b2, t1, t2) repHALF(0, 0) B[j + (t1)][i + (t2)] = A[i + (b1)][j + (b2)]
+#define copyQUAD(b1, b2, t1, t2) repHALF(0, 0) B[j + (t1)][i + (t2)] = B[j + (b1)][i + (b2)]
 
 void transBlock(int M, int N, int A[N][M], int B[M][N], int bi, int bj) {
     int i, j;
-    repBLOCK(i, j, bi, bj) B[j][i] = A[i][j];
+    repBLOCK(bi, bj) B[j][i] = A[i][j];
 }
 
 char desc32[] = "For 32x32";
 void trans32(int M, int N, int A[N][M], int B[M][N]) {
     int i, j, k;
     iteBLOCK(k, 1, N) {
-        repBLOCK(i, j, 0, 0) B[j][i] = A[i + k][j + k];
-        repBLOCK(i, j, 0, 0) B[i + k][j + k] = B[i][j];
+        repBLOCK(0, 0) B[j][i] = A[i + k][j + k];
+        repBLOCK(0, 0) B[i + k][j + k] = B[i][j];
     }
-    repBLOCK(i, j, 0, 0) B[j][i] = A[i][j];
+    repBLOCK(0, 0) B[j][i] = A[i][j];
     iteBLOCK(i, 0, N) iteBLOCK(j, 0, M) if (i != j) {
         transBlock(M, N, A, B, i, j);
     }
@@ -41,11 +43,17 @@ void trans32(int M, int N, int A[N][M], int B[M][N]) {
 
 void transHalf(int M, int N, int A[N][M], int B[M][N], int bi, int bj, int t) {
     int i, j;
-    repHALF(i, j, bi, bj) B[j][i] = A[i][j];
-    repHALF(i, j, 0, 0) B[t + j][t + i] = A[i + bi][j + bj + HALF];
-    repHALF(i, j, bi + HALF, bj) B[j][i] = A[i][j];
-    repHALF(i, j, 0, 0) B[j + bj + HALF][i + bi] = B[t + j][t + i];
-    repHALF(i, j, bi + HALF, bj + HALF) B[j][i] = A[i][j];
+    transQUAD(bi, bj, bj, bi);
+    transQUAD(bi, bj + HALF, t, t);
+    transQUAD(bi + HALF, bj, bj, bi + HALF);
+    copyQUAD(t, t, bj + HALF, bi);
+    transQUAD(bi + HALF, bj + HALF, bj + HALF, bi + HALF);
+}
+
+void transFullHalf(int M, int N, int A[N][M], int B[M][N], int b, int t1, int t2, int t) {
+    int i, j;
+    repHALF(0, 0) B[t1 + j][t2 + i] = A[i + b][j + b];
+    repHALF(0, 0) B[t1 + j][t2 + i + HALF] = A[i + b][j + b + HALF];
 }
 
 char desc64[] = "For 64x64";
@@ -57,7 +65,7 @@ void trans64(int M, int N, int A[N][M], int B[M][N]) {
     transHalf(M, N, A, B, BLOCK, 0, 2 * BLOCK);
     transHalf(M, N, A, B, 0, BLOCK, 2 * BLOCK);
     iteBLOCK(k, 0, N) {
-        repBLOCK(i, j, k, k) B[j][i] = A[i][j];
+        repBLOCK(k, k) B[j][i] = A[i][j];
     }
 }
 
