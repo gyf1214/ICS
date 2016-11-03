@@ -9,7 +9,7 @@ SIMFLAG = -v -s 5 -E 1 -b 5
 TRACE = trace.f0
 TRACETAR = trace.ff0
 
-test-trans-all: trans
+test-trans-all: trans-all
 	./test-trans -M $(M) -N $(N)
 	./csim-ref $(SIMFLAG) -t $(TRACE) > $(TRACETAR)
 
