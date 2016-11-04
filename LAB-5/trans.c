@@ -123,5 +123,6 @@ void transMain(int M, int N, int A[N][M], int B[M][N]) {
 
 void registerFunctions()
 {
+    registerTransFunction(trans61, desc61);
     registerTransFunction(transMain, transpose_submit_desc);
 }
