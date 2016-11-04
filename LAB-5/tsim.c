@@ -1,10 +1,10 @@
 #include <stdio.h>
 #include "cachelab.h"
 
-#define SIZE 32
+#define SIZE 31
 #define rep(i) for (i = 0; i < SIZE; ++i)
 
-void trans64(int M, int N, int A[N][M], int B[M][N]);
+void trans61(int M, int N, int A[N][M], int B[M][N]);
 
 int A[SIZE][SIZE], B[SIZE][SIZE];
 
@@ -26,7 +26,7 @@ int main() {
         A[i][j] = (i * SIZE + j) % 1000;
     }
     print(A);
-    trans64(SIZE, SIZE, A, B);
+    trans61(SIZE, SIZE, A, B);
     print(B);
 
     return 0;

@@ -15,8 +15,8 @@ void trans(int M, int N, int A[N][M], int B[M][N]) {
     }
 }
 
-#define BLOCK 8
-#define HALF BLOCK / 2
+#define BLOCK (8)
+#define HALF (BLOCK / 2)
 #define repBLOCK(bi, bj) for (i = (bi); i < (bi) + BLOCK; ++i) for (j = (bj); j < (bj) + BLOCK; ++j)
 #define iteBLOCK(i, bi, N) for (i = (bi) * BLOCK; i < (N); i += BLOCK)
 #define repHALF(bi, bj) for (i = (bi); i < (bi) + HALF; ++i) for (j = (bj); j < (bj) + HALF; ++j)
@@ -78,6 +78,37 @@ void trans64(int M, int N, int A[N][M], int B[M][N]) {
     transHalf(M, N, A, B, BLOCK, 0, 2);
     transHalf(M, N, A, B, 0, BLOCK, 2);
     repBLOCK(BLOCK * 2, BLOCK * 2) B[j][i] = A[i][j];
+}
+
+#define BLOCK0 16
+#define safeRead(a, i, j) if ((i) < N && (j) < M) a = A[(i)][(j)]
+#define safeWrite(a, i, j) if ((i) < N && (j) < M) B[(j)][(i)] = a
+
+char desc61[] = "For 61x67";
+void trans61(int M, int N, int A[N][M], int B[M][N]) {
+    int i, j, k, a0, a1, a2, a3, a4, a5, a6, a7;
+    for (i = 0; i < N; i += BLOCK0) {
+        for (j = 0; j < M; j += HALF) {
+            for (k = i; k < i + BLOCK0 && k < N; k += 8 / HALF) {
+                safeRead(a0, k, j);
+                safeRead(a1, k, j + 1);
+                safeRead(a2, k, j + 2);
+                safeRead(a3, k, j + 3);
+                safeRead(a4, k + 1, j);
+                safeRead(a5, k + 1, j + 1);
+                safeRead(a6, k + 1, j + 2);
+                safeRead(a7, k + 1, j + 3);
+                safeWrite(a0, k, j);
+                safeWrite(a1, k, j + 1);
+                safeWrite(a2, k, j + 2);
+                safeWrite(a3, k, j + 3);
+                safeWrite(a4, k + 1, j);
+                safeWrite(a5, k + 1, j + 1);
+                safeWrite(a6, k + 1, j + 2);
+                safeWrite(a7, k + 1, j + 3);
+            }
+        }
+    }
 }
 
 void transMain(int M, int N, int A[N][M], int B[M][N]) {
