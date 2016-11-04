@@ -80,7 +80,7 @@ void trans64(int M, int N, int A[N][M], int B[M][N]) {
     repBLOCK(BLOCK * 2, BLOCK * 2) B[j][i] = A[i][j];
 }
 
-#define BLOCK0 (BLOCK)
+#define BLOCK0 16
 #define safeRead(a, i, j) if ((i) < N && (j) < M) a = A[(i)][(j)]
 #define safeWrite(a, i, j) if ((i) < N && (j) < M) B[(j)][(i)] = a
 
