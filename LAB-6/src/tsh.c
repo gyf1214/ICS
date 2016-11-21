@@ -456,6 +456,7 @@ parseline(const char *cmdline, struct cmdline_tokens *tok)
 void
 sigchld_handler(int sig)
 {
+    sio_puts("test");
     for (;;) {
         int status;
         int pid = waitpid(-1, &status, WNOHANG | WUNTRACED);
