@@ -1,0 +1,14 @@
+*.o
+runtrace
+sdriver
+tsh
+myspin1
+myspin2
+myenv
+myintp
+myints
+mytstpp
+mytstps
+mysplit
+mysplitp
+mycat
