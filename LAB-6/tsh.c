@@ -185,6 +185,15 @@ void waitFG() {
     }
 }
 
+int safeOpen(const char *path, int flags, int term) {
+    int fd = open(path, flags, 0644);
+    if (fd < 0) {
+        printf("Error: %s Couldn't open file\n", path);
+        if (term) exit(1);
+    }
+    return fd;
+}
+
 void runProg(char *cmdline, struct cmdline_tokens *tok, int bg) {
     setMask(SIG_BLOCK);
 
@@ -194,6 +203,15 @@ void runProg(char *cmdline, struct cmdline_tokens *tok, int bg) {
         recoverHandler();
         setpgid(0, 0);
         setMask(SIG_UNBLOCK);
+        int fd;
+        if (tok -> infile) {
+            fd = safeOpen(tok -> infile, O_WRONLY | O_CREAT, 1);
+            dup2(fd, STDIN_FILENO);
+        }
+        if (tok -> outfile) {
+            fd = safeOpen(tok -> outfile, O_RDONLY, 1);
+            dup2(fd, STDOUT_FILENO);
+        }
         execve(tok -> argv[0], tok -> argv, environ);
         printf("%s: Command not found\n", tok -> argv[0]);
         exit(1);
@@ -205,12 +223,22 @@ void runProg(char *cmdline, struct cmdline_tokens *tok, int bg) {
     setMask(SIG_UNBLOCK);
 }
 
+void doJobs(struct cmdline_tokens *tok) {
+    int fd = STDOUT_FILENO;
+    if (tok -> outfile) {
+        fd = safeOpen(tok -> outfile, O_WRONLY | O_CREAT, 0);
+        if (fd < 0) return;
+    }
+    listjobs(job_list, fd);
+    if (tok -> outfile) close(fd);
+}
+
 void runCommand(char *cmdline, struct cmdline_tokens *tok, int bg) {
     switch (tok -> builtins) {
         case BUILTIN_QUIT:
             exit(0);
         case BUILTIN_JOBS:
-            listjobs(job_list, STDOUT_FILENO);
+            doJobs(tok);
             break;
         case BUILTIN_FG:
             recoverJob(tok -> argv[1], FG);
