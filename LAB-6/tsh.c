@@ -127,11 +127,11 @@ void recoverHandler() {
 
 void reapJob(struct job_t *job, int status) {
     if (WIFEXITED(status)) {
-        clearjob(job);
+        deletejob(job_list, job);
     } else if (WIFSIGNALED(status)) {
         printf("Job [%d] (%d) terminated by signal %d\n",
             job -> jid, job -> pid, WTERMSIG(status));
-        clearjob(job);
+        deletejob(job_list, job);
     } else if (WIFSTOPPED(status)) {
         //TODO
     }
@@ -465,11 +465,7 @@ sigchld_handler(int sig)
         int status;
         pid_t pid = waitpid(-1, &status, WNOHANG | WUNTRACED);
         if (pid <= 0) break;
-        if (verbose) {
-            sio_puts("sigchld: handle pid ");
-            sio_putl(pid);
-            sio_puts("\n");
-        }
+        if (verbose) printf("sigchld: handle pid %d\n", pid);
         struct job_t *job = getjobpid(job_list, pid);
         if (job) reapJob(job, status);
     }
