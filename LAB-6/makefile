@@ -8,7 +8,7 @@ CFLAGS = -Wall -g -Werror
 
 FILES = sdriver runtrace tsh myspin1 myspin2 myenv myintp myints mytstpp mytstps mysplit mysplitp mycat
 
-TEST = 17
+TEST = 22
 
 test: all
 	./sdriver -t $(TEST) 2> /dev/null
