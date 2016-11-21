@@ -137,12 +137,16 @@ void reapJob(struct job_t *job, int status) {
     }
 }
 
+void printJob(struct job_t *job) {
+    printf("[%d] (%d) %s\n", job -> jid, job -> pid, job -> cmdline);
+}
+
 void runProg(char *cmdline, struct cmdline_tokens *tok, int bg) {
     sigset_t empty;
     sigemptyset(&empty);
     setMask(SIG_BLOCK);
 
-    int pid = fork();
+    pid_t pid = fork();
 
     if (pid == 0) {
         recoverHandler();
@@ -153,7 +157,10 @@ void runProg(char *cmdline, struct cmdline_tokens *tok, int bg) {
         exit(1);
     }
 
-    addjob(job_list, pid, bg + 1, cmdline);
+    addjob(job_list, pid, FG, cmdline);
+    struct job_t *job = getjobpid(job_list, pid);
+    printJob(job);
+
 
     setMask(SIG_UNBLOCK);
 
