@@ -127,7 +127,7 @@ void recoverHandler() {
 
 void reapJob(struct job_t *job, int status) {
     if (WIFEXITED(status)) {
-        if (verbose) printf("Job [%d] (%d) exited with code %d\n",
+        if (verbose) printf("reapJob: [%d] (%d) exited with code %d\n",
             job -> jid, job -> pid, WEXITSTATUS(status));
         deletejob(job_list, job);
     } else if (WIFSIGNALED(status)) {
@@ -575,7 +575,7 @@ struct job_t
                 nextjid = 1;
             strcpy(job_list[i].cmdline, cmdline);
             if(verbose){
-                printf("Added job [%d] %d %s\n",
+                printf("addjob: [%d] %d %s\n",
                        job_list[i].jid,
                        job_list[i].pid,
                        job_list[i].cmdline);
