@@ -87,7 +87,7 @@ void clearjob(struct job_t *job);
 void initjobs(struct job_t *job_list);
 int maxjid(struct job_t *job_list);
 struct job_t *addjob(struct job_t *job_list, pid_t pid, int state, char *cmdline);
-int deletejob(struct job_t *job_list, pid_t pid);
+int deletejob(struct job_t *job_list, struct job_t *job);
 pid_t fgpid(struct job_t *job_list);
 struct job_t *getjobpid(struct job_t *job_list, pid_t pid);
 struct job_t *getjobjid(struct job_t *job_list, int jid);
@@ -579,21 +579,11 @@ struct job_t
 
 /* deletejob - Delete a job whose PID=pid from the job list */
 int
-deletejob(struct job_t *job_list, pid_t pid)
-{
-    int i;
-
-    if (pid < 1)
-        return 0;
-
-    for (i = 0; i < MAXJOBS; i++) {
-        if (job_list[i].pid == pid) {
-            clearjob(&job_list[i]);
-            nextjid = maxjid(job_list)+1;
-            return 1;
-        }
-    }
-    return 0;
+deletejob(struct job_t *job_list, struct job_t *job) {
+    if (!job) return 0;
+    clearjob(job);
+    nextjid = maxjid(job_list) + 1;
+    return 1;
 }
 
 /* fgpid - Return PID of current foreground job, 0 if no such job */
