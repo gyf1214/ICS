@@ -1,7 +1,6 @@
+SRC = src/tsh.c
 TAR = handout/tsh.c
 
-all : $(TAR)
+all : $(SRC)
+	cp $(SRC) $(TAR)
 	make -C handout all
-
-handout/% : src/%
-	cp $< $@
