@@ -157,8 +157,8 @@ void runProg(char *cmdline, struct cmdline_tokens *tok, int bg) {
         exit(1);
     }
 
-    struct job_t *job = addjob(job_list, pid, FG, cmdline);
-    printJob(job);
+    struct job_t *job = addjob(job_list, pid, bg + 1, cmdline);
+    if (bg) printJob(job);
 
     setMask(SIG_UNBLOCK);
 
