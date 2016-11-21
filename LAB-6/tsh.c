@@ -173,6 +173,7 @@ void recoverJob(char *arg, int state) {
             job -> jid, job -> pid, state == BG ? "background" : "foreground");
         if (state == BG) printJob(job);
         job -> state = state;
+        kill(job -> pid, SIGCONT);
     }
 }
 
