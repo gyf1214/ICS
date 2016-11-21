@@ -106,9 +106,84 @@ handler_t *Signal(int signum, handler_t *handler);
 
 /*
  * start Tiny
+ */
+
+void setMask(int how) {
+    sigset_t mask;
+    sigemptyset(&mask);
+    sigaddset(&mask, SIGINT);
+    sigaddset(&mask, SIGTSTP);
+    sigaddset(&mask, SIGCHLD);
+    sigaddset(&mask, SIGQUIT);
+    sigprocmask(how, &mask, NULL);
+}
+
+void recoverHandler() {
+    Signal(SIGINT,  SIG_DFL);
+    Signal(SIGTSTP, SIG_DFL);
+    Signal(SIGCHLD, SIG_DFL);
+    Signal(SIGQUIT, SIG_DFL);
+}
+
+void reapJob(struct job_t *job, int status) {
+    if (WIFEXITED(status)) {
+        clearjob(job);
+    } else if (WIFSIGNALED(status)) {
+        printf("Job [%d] (%d) terminated by signal %d\n",
+            job -> jid, job -> pid, WTERMSIG(status));
+        clearjob(job);
+    } else if (WIFSTOPPED(status)) {
+        //TODO
+    }
+}
+
+void runProg(char *cmdline, struct cmdline_tokens *tok, int bg) {
+    sigset_t empty;
+    sigemptyset(&empty);
+    setMask(SIG_BLOCK);
+
+    int pid = fork();
+
+    if (pid == 0) {
+        recoverHandler();
+        setpgid(0, 0);
+        setMask(SIG_UNBLOCK);
+        execve(tok -> argv[0], tok -> argv, environ);
+        printf("%s: Command not found\n", tok -> argv[0]);
+        exit(1);
+    }
+
+    addjob(job_list, pid, bg + 1, cmdline);
+
+    setMask(SIG_UNBLOCK);
+
+    while (fgpid(job_list)) {
+        sigsuspend(&empty);
+    }
+}
+
+void runCommand(char *cmdline, struct cmdline_tokens *tok, int bg) {
+    switch (tok -> builtins) {
+        case BUILTIN_QUIT:
+            exit(0);
+        case BUILTIN_JOBS:
+            listjobs(job_list, STDOUT_FILENO);
+            break;
+        case BUILTIN_FG:
+            //TODO
+            break;
+        case BUILTIN_BG:
+            //TODO
+            break;
+        case BUILTIN_NONE:
+            runProg(cmdline, tok, bg);
+            break;
+    }
+}
 
 
 
+/*
  * end Tiny
  */
 
@@ -213,22 +288,7 @@ eval(char *cmdline)
     if (tok.argv[0] == NULL) /* ignore empty lines */
         return;
 
-    switch (tok.builtins) {
-        case BUILTIN_QUIT:
-            exit(0);
-        case BUILTIN_JOBS:
-            listjobs(job_list, STDOUT_FILENO);
-            break;
-        case BUILTIN_FG:
-            //TODO
-            break;
-        case BUILTIN_BG:
-            //TODO
-            break;
-        case BUILTIN_NONE:
-            //TODO
-            break;
-    }
+    runCommand(cmdline, &tok, bg);
 
     return;
 }
