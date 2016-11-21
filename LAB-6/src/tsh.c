@@ -461,10 +461,9 @@ sigchld_handler(int sig)
         pid_t pid = waitpid(-1, &status, WNOHANG | WUNTRACED);
         if (pid <= 0) break;
         if (verbose) {
-            printf("sigchld: handle pid %d\n", pid);
-            // sio_puts("sigchld: handle pid ");
-            // sio_putl(pid);
-            // sio_puts("\n");
+            sio_puts("sigchld: handle pid ");
+            sio_putl(pid);
+            sio_puts("\n");
         }
         struct job_t *job = getjobpid(job_list, pid);
         if (job) reapJob(job, status);
