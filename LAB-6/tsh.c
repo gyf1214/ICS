@@ -205,11 +205,11 @@ void runProg(char *cmdline, struct cmdline_tokens *tok, int bg) {
         setMask(SIG_UNBLOCK);
         int fd;
         if (tok -> infile) {
-            fd = safeOpen(tok -> infile, O_WRONLY | O_CREAT, 1);
+            fd = safeOpen(tok -> infile, O_RDONLY, 1);
             dup2(fd, STDIN_FILENO);
         }
         if (tok -> outfile) {
-            fd = safeOpen(tok -> outfile, O_RDONLY, 1);
+            fd = safeOpen(tok -> outfile, O_WRONLY | O_CREAT, 1);
             dup2(fd, STDOUT_FILENO);
         }
         execve(tok -> argv[0], tok -> argv, environ);
