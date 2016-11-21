@@ -145,7 +145,7 @@ void forward(int sig) {
     int pid = fgpid(job_list);
     if (pid > 0) {
         if (verbose) printf("forward: send signal %d to foreward %d\n", sig, pid);
-        kill(pid, sig);
+        kill(-pid, sig);
     }
 }
 
