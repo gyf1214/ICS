@@ -460,6 +460,7 @@ sigchld_handler(int sig)
         int status;
         pid_t pid = waitpid(-1, &status, WNOHANG | WUNTRACED);
         if (!pid) break;
+        if (pid < 0) sio_error("???");
         //if (verbose) {
             sio_puts("sigchld: handle pid ");
             sio_putl(pid);
