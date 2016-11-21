@@ -6,8 +6,12 @@
 CC = /usr/bin/gcc
 CFLAGS = -Wall -g -Werror
 
-
 FILES = sdriver runtrace tsh myspin1 myspin2 myenv myintp myints mytstpp mytstps mysplit mysplitp mycat
+
+TEST = 15
+
+test: all
+	./sdriver -t $(TEST) 2> /dev/null
 
 all: $(FILES)
 
