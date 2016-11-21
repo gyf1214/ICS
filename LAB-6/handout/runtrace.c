@@ -1,4 +1,4 @@
-/*
+/* 
  * runtrace.c - Shell lab trace execution program
  *
  * Runs a tiny shell on a trace file.
@@ -22,8 +22,8 @@
 
 #define MAXBUF 1024
 
-/*
- * Global variables
+/* 
+ * Global variables 
  */
 char buf[MAXBUF];
 char line[MAXBUF];
@@ -53,7 +53,7 @@ void clean(void);
 /*
  * sigalrm_handler - Notify when we timeout waiting for the child
  */
-void sigalrm_handler(int sig)
+void sigalrm_handler(int sig) 
 {
     printf("%s: Runtrace timed out while %s.\n", tracefile, state);
     clean();
@@ -61,7 +61,7 @@ void sigalrm_handler(int sig)
 }
 
 /* Main routine */
-int main(int argc, char **argv)
+int main(int argc, char **argv) 
 {
     char *shellargv[MAXARGS];
     int child_pid;
@@ -70,7 +70,7 @@ int main(int argc, char **argv)
     FILE *tracefp;
     int n=0; /* keep gcc happy */
     struct stat statbuf;
-
+    
     /* Install the signal handler */
     signal(SIGALRM, sigalrm_handler);
 
@@ -99,7 +99,7 @@ int main(int argc, char **argv)
 
     if (!tracefile)
 	  usage("Missing required argument (-f)");
-
+    
     /* Make sure the requested shell is executable */
     if (stat(shellprog, &statbuf) < 0) {
 	fprintf(stderr, "%s: File not found\n", shellprog);
@@ -108,7 +108,7 @@ int main(int argc, char **argv)
     if (!(statbuf.st_mode & S_IXUSR)) {
 	fprintf(stderr, "%s: File is not executable\n", shellprog);
 	exit(1);
-    }
+    } 
 
     /* Open the trace file for reading */
     if ((tracefp = fopen(tracefile, "r")) == NULL) {
@@ -143,10 +143,10 @@ int main(int argc, char **argv)
     }
 
 
-    /*************************
+    /************************* 
      * Child code runs a shell
-     *************************/
-    if ((child_pid  = fork()) == 0) {
+     *************************/ 
+    if ((child_pid  = fork()) == 0) {  
 
 	/* Close the descriptor the child is not using */
 	close(datafd[0]);
@@ -154,15 +154,15 @@ int main(int argc, char **argv)
 	/* Redirect stdin and stdout to the domain socket */
 	dup2(datafd[1], 0);
 	dup2(datafd[1], 1);
-
+	
 	/* Create the shell command line arguments */
 	shellargv[0] = shellprog;
 	if (verbose) {
 	    shellargv[1] = "-v";
-	    shellargv[2] = NULL;
+	    shellargv[2] = '\0';
 	}
 	else {
-	    shellargv[1] = NULL;
+	    shellargv[1] = '\0';
 	}
 
 	/* Modify the environment if sandboxing is enabled */
@@ -178,17 +178,18 @@ int main(int argc, char **argv)
 	}
     }
 
-    /********************************************************
+    /******************************************************** 
      * Parent code sends trace-driven commands to child shell
      *******************************************************/
 
     /* Close the descriptor the parent is not using */
-    close(datafd[1]);
+    close(datafd[1]); 
 
     /* Read the initial prompt from the shell */
     if (readable(datafd[0], DRIVER_TIMEOUT) == 0) {
 	fprintf(stderr, "%s: Runtrace timed out waiting for initial shell prompt\n", tracefile);
-    }
+        n = n; /* keep gcc happy */
+    }     
     else {
 	bzero(buf, MAXBUF);
 	n = recv(datafd[0], buf, MAXBUF, 0);
@@ -198,8 +199,8 @@ int main(int argc, char **argv)
 	}
     }
 
-    /*
-     * Parent reads trace file and sends commands to the shell
+    /* 
+     * Parent reads trace file and sends commands to the shell 
      */
     while (fgets(line, MAXBUF, tracefp)) {
 
@@ -207,13 +208,13 @@ int main(int argc, char **argv)
 	line[strlen(line)-1] = '\0';
 
 	/* Ignore blank lines */
-	if (blankline(line)) {
-	    if (verbose)
+	if (blankline(line)) { 
+	    if (verbose) 
 		printf("runtrace: Ignoring blank line\n");
 	    continue;
 	}
 
-	/* Echo comment lines */
+	/* Echo comment lines */ 
 	if (line[0] == '#') {
 	    printf("%s\n", line);
 	    continue;
@@ -223,11 +224,11 @@ int main(int argc, char **argv)
 	sscanf(line, "%s", command);
 	if (verbose)
 	    printf("runtrace: command=%s line=%s\n", command, line);
-
+	
 	/* WAIT command */
 	if (!strcmp(command, "WAIT")) {
 	    if (readable(syncfd[0], DRIVER_TIMEOUT) == 0) {
-		printf("%s: Runtrace timed out waiting for sync from job\n",
+		printf("%s: Runtrace timed out waiting for sync from job\n", 
 		       tracefile);
 		exit(1);
 	    }
@@ -246,7 +247,7 @@ int main(int argc, char **argv)
 
 	/* NEXT command */
 	else if (!strcmp(command, "NEXT")) {
-	    if (next_prompt() == 0)
+	    if (next_prompt() == 0) 
 		exit(0);
 	    continue;
 	}
@@ -315,7 +316,7 @@ int main(int argc, char **argv)
 
 
 /*
- * clean - clean up any stray jobs or shells
+ * clean - clean up any stray jobs or shells 
  */
 void clean() {
     system("/bin/kill -9 tsh tshref mytstpp mytstps mycat myenv myintp myints myspin1 myspin2 mysplit > /dev/null 2>&1");
@@ -350,13 +351,13 @@ int blankline(char *str)
     return 1;
 }
 
-
+	
 /*
  * print_child_status - Print the exit/termination status of the shell after a timeout
  */
 void print_child_status()
 {
-    pid_t pid;
+    pid_t pid; 
     int status;
 
     pid = waitpid(-1, &status, WNOHANG);
@@ -367,13 +368,13 @@ void print_child_status()
 	    fflush(stdout);
 	    return;
 	}
-
-	if (WIFSIGNALED(status)) {
+	
+	if (WIFSIGNALED(status)) { 
 	    printf("Child shell terminated by signal %d\n", WTERMSIG(status));
 	    fflush(stdout);
 	    return;
 	}
-
+	
 	if (WIFSTOPPED(status)) {
 	    printf("Child shell stopped by signal %d\n", WSTOPSIG(status));
 	    fflush(stdout);
@@ -404,10 +405,10 @@ void print_child_status()
 int next_prompt(void)
 {
     int n;
-
+    
     bzero(buf, MAXBUF);
     if (readable(datafd[0], DRIVER_TIMEOUT) == 0) {
-	printf("%s: Runtrace timed out waiting for next shell prompt\n",
+	printf("%s: Runtrace timed out waiting for next shell prompt\n", 
 	       tracefile);
 	print_child_status();
 	return 0;
@@ -419,7 +420,7 @@ int next_prompt(void)
 	}
 	else if (n == 0) { /* EOF */
 	    return 0;
-	}
+	} 
     }
 
     while(strcmp(buf, PROMPT)) {
@@ -427,7 +428,7 @@ int next_prompt(void)
 
 	bzero(buf, MAXBUF);
 	if (readable(datafd[0], DRIVER_TIMEOUT) == 0) {
-	    printf("%s: Runtrace timed out waiting for next shell prompt\n",
+	    printf("%s: Runtrace timed out waiting for next shell prompt\n", 
 		   tracefile);
 	    print_child_status();
 	    return 0;
@@ -439,7 +440,7 @@ int next_prompt(void)
 	    }
 	    else if (n == 0) { /* EOF */
 		return 0;
-	    }
+	    } 
 	}
     }
     return 1;
@@ -449,7 +450,7 @@ int next_prompt(void)
  * readable - Wait secs seconds for descriptor fd to become readable
  *            Return > 0 if fd is readable, 0 if timeout.
  */
-int readable(int fd, int secs)
+int readable(int fd, int secs) 
 {
     int n;
 
@@ -461,7 +462,7 @@ int readable(int fd, int secs)
 
     tv.tv_sec = secs;
     tv.tv_usec = 0;
-
+    
     if ((n = select(fd+1, &rset, NULL, NULL, &tv)) < 0) {
 	perror("select");
 	exit(1);
