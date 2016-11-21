@@ -153,9 +153,38 @@ void printJob(struct job_t *job) {
     printf("[%d] (%d) %s\n", job -> jid, job -> pid, job -> cmdline);
 }
 
-void runProg(char *cmdline, struct cmdline_tokens *tok, int bg) {
+struct job_t *parseJob(char *arg) {
+    if (verbose) printf("parseJob: %s\n", arg);
+    struct job_t *job;
+    if (arg[0] == '%') {
+        job = getjobjid(job_list, atoi(arg + 1));
+    } else {
+        job = getjobpid(job_list, atoi(arg));
+    }
+    return job;
+}
+
+void recoverJob(char *arg, int state) {
+    struct job_t *job = parseJob(arg);
+    if (!job || job -> state == UNDEF) {
+        printf("%s: No such job\n", arg);
+    } else {
+        if (verbose) printf("recoverJob: send [%d] (%d) to %s\n",
+            job -> jid, job -> pid, state == BG ? "background" : "foreground");
+        if (state == BG) printJob(job);
+        job -> state = state;
+    }
+}
+
+void waitFG() {
     sigset_t empty;
     sigemptyset(&empty);
+    while (fgpid(job_list)) {
+        sigsuspend(&empty);
+    }
+}
+
+void runProg(char *cmdline, struct cmdline_tokens *tok, int bg) {
     setMask(SIG_BLOCK);
 
     pid_t pid = fork();
@@ -169,14 +198,10 @@ void runProg(char *cmdline, struct cmdline_tokens *tok, int bg) {
         exit(1);
     }
 
-    struct job_t *job = addjob(job_list, pid, bg + 1, cmdline);
+    struct job_t *job = addjob(job_list, pid, bg ? BG : FG, cmdline);
     if (bg) printJob(job);
 
     setMask(SIG_UNBLOCK);
-
-    while (fgpid(job_list)) {
-        sigsuspend(&empty);
-    }
 }
 
 void runCommand(char *cmdline, struct cmdline_tokens *tok, int bg) {
@@ -187,15 +212,17 @@ void runCommand(char *cmdline, struct cmdline_tokens *tok, int bg) {
             listjobs(job_list, STDOUT_FILENO);
             break;
         case BUILTIN_FG:
-            //TODO
+            recoverJob(tok -> argv[1], FG);
             break;
         case BUILTIN_BG:
-            //TODO
+            recoverJob(tok -> argv[1], BG);
             break;
         case BUILTIN_NONE:
             runProg(cmdline, tok, bg);
             break;
     }
+
+    waitFG();
 }
 
 
