@@ -135,7 +135,9 @@ void reapJob(struct job_t *job, int status) {
             job -> jid, job -> pid, WTERMSIG(status));
         deletejob(job_list, job);
     } else if (WIFSTOPPED(status)) {
-        //TODO
+        printf("Job [%d] (%d) stopped by signal %d\n",
+            job -> jid, job -> pid, WSTOPSIG(status));
+        job -> state = ST;
     }
 }
 
