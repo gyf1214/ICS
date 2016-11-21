@@ -456,11 +456,15 @@ parseline(const char *cmdline, struct cmdline_tokens *tok)
 void
 sigchld_handler(int sig)
 {
-    sio_puts("test\n");
     for (;;) {
         int status;
-        int pid = waitpid(-1, &status, WNOHANG | WUNTRACED);
+        pid_t pid = waitpid(-1, &status, WNOHANG | WUNTRACED);
         if (!pid) break;
+        if (verbose) {
+            sio_puts("sigchld: handle pid ");
+            sio_putl(pid);
+            sio_puts("\n");
+        }
         struct job_t *job = getjobpid(job_list, pid);
         reapJob(job, status);
     }
