@@ -459,6 +459,7 @@ sigchld_handler(int sig)
     for (;;) {
         int status;
         pid_t pid = waitpid(-1, &status, WNOHANG | WUNTRACED);
+        if (pid < 0) unix_error("???");
         if (!pid) break;
         //if (verbose) {
             sio_puts("sigchld: handle pid ");
@@ -467,7 +468,7 @@ sigchld_handler(int sig)
             sio_puts("\n");
         //}
         struct job_t *job = getjobpid(job_list, pid);
-        reapJob(job, status);
+        if (job) reapJob(job, status);
     }
 }
 
