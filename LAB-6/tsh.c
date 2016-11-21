@@ -127,6 +127,8 @@ void recoverHandler() {
 
 void reapJob(struct job_t *job, int status) {
     if (WIFEXITED(status)) {
+        if (verbose) printf("Job [%d] (%d) exited with code %d\n",
+            job -> jid, job -> pid, WEXITSTATUS(status));
         deletejob(job_list, job);
     } else if (WIFSIGNALED(status)) {
         printf("Job [%d] (%d) terminated by signal %d\n",
@@ -134,6 +136,14 @@ void reapJob(struct job_t *job, int status) {
         deletejob(job_list, job);
     } else if (WIFSTOPPED(status)) {
         //TODO
+    }
+}
+
+void forward(int sig) {
+    int pid = fgpid(job_list);
+    if (pid > 0) {
+        if (verbose) printf("forward: send signal %d to foreward %d\n", sig, pid);
+        kill(pid, sig);
     }
 }
 
@@ -479,7 +489,8 @@ sigchld_handler(int sig)
 void
 sigint_handler(int sig)
 {
-    return;
+    if (verbose) printf("sigint: enter\n");
+    forward(SIGINT);
 }
 
 /*
@@ -490,7 +501,8 @@ sigint_handler(int sig)
 void
 sigtstp_handler(int sig)
 {
-    return;
+    if (verbose) printf("sigtstp: enter\n");
+    forward(SIGTSTP);
 }
 
 /*
