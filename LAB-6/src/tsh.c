@@ -86,7 +86,7 @@ void sigquit_handler(int sig);
 void clearjob(struct job_t *job);
 void initjobs(struct job_t *job_list);
 int maxjid(struct job_t *job_list);
-int addjob(struct job_t *job_list, pid_t pid, int state, char *cmdline);
+struct job_t *addjob(struct job_t *job_list, pid_t pid, int state, char *cmdline);
 int deletejob(struct job_t *job_list, pid_t pid);
 pid_t fgpid(struct job_t *job_list);
 struct job_t *getjobpid(struct job_t *job_list, pid_t pid);
@@ -157,10 +157,8 @@ void runProg(char *cmdline, struct cmdline_tokens *tok, int bg) {
         exit(1);
     }
 
-    addjob(job_list, pid, FG, cmdline);
-    struct job_t *job = getjobpid(job_list, pid);
-    job = job;
-    // printJob(job);
+    struct job_t *job = addjob(job_list, pid, FG, cmdline);
+    printJob(job);
 
     setMask(SIG_UNBLOCK);
 
@@ -550,8 +548,8 @@ maxjid(struct job_t *job_list)
 }
 
 /* addjob - Add a job to the job list */
-int
-addjob(struct job_t *job_list, pid_t pid, int state, char *cmdline)
+struct job_t
+*addjob(struct job_t *job_list, pid_t pid, int state, char *cmdline)
 {
     int i;
 
@@ -572,11 +570,11 @@ addjob(struct job_t *job_list, pid_t pid, int state, char *cmdline)
                        job_list[i].pid,
                        job_list[i].cmdline);
             }
-            return 1;
+            return &job_list[i];
         }
     }
     printf("Tried to create too many jobs\n");
-    return 0;
+    return NULL;
 }
 
 /* deletejob - Delete a job whose PID=pid from the job list */
