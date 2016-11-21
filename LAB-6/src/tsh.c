@@ -460,7 +460,7 @@ sigchld_handler(int sig)
         int status;
         int pid = waitpid(-1, &status, WNOHANG | WUNTRACED);
         if (!pid) break;
-        if (verbose) printf("sigchld: receive signal from %d\n", pid);
+        //if (verbose) printf("sigchld: receive signal from %d\n", pid);
         struct job_t *job = getjobpid(job_list, pid);
         reapJob(job, status);
     }
