@@ -8,9 +8,9 @@ Because the father process and the child process have their own memory space res
 
 ## 8.21 ##
 
-fork() ----> "b" ----> waitpid() ----> "c"
-        |               |
-        ---> "a" --------
+    fork() ----> "b" ----> waitpid() ----> "c"
+            |               |
+            ---> "a" --------
 
 The possible output sequence is the topological sequence of the flow graph:
 
