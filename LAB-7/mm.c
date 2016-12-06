@@ -127,7 +127,7 @@ static inline ptr coalesceBlock(ptr p) {
 }
 
 static inline ptr extendChunk(size_t size) {
-    size = (size + CHUNKSIZE - 1) & (~(CHUNKSIZE - 1));
+    size = (size + 8 + CHUNKSIZE - 1) & (~(CHUNKSIZE - 1));
     ptr p = mem_sbrk(size);
     setTag(p, PACK(CHUNKSIZE - 8, 0));
     end = p + size;
@@ -224,8 +224,48 @@ void free (void *_p) {
  * realloc - you may want to look at mm-naive.c
  */
 void *realloc(void *oldptr, size_t size) {
-    free(oldptr);
-    return malloc(size);
+    if (!oldptr) return malloc(size);
+    size = ALIGN(size);
+    ptr p = (ptr) oldptr;
+    u32 capcity = SIZE(p);
+    if (size + 8 < capcity) {
+        ptr q = p + size + 8;
+        setTag(p, PACK(size, 1));
+        setTag(q, PACK(capcity - size - 8, 0));
+        pushBlock(q);
+        return p;
+    } else if (size <= SIZE(p)) {
+        return p;
+    } else {
+        u32 more = size - capcity - 8;
+        ptr q = RIGHT(p);
+        if (q >= end) {
+            q = extendChunk(more);
+        } else {
+            if (USED(q)) {
+                q = NULL;
+            } else {
+                u32 new_cap = capcity + SIZE(q) + 8;
+                if (new_cap < size) {
+                    if (RIGHT(q) >= end) {
+                        q = extendChunk(size - new_cap);
+                    } else {
+                        q = NULL;
+                    }
+                }
+            }
+        }
+        if (q) {
+            allocateBlock(q, more);
+            setTag(p, PACK(size, 1));
+            return p;
+        } else {
+            q = malloc(size);
+            memcpy(q, p, capcity);
+            free(p);
+            return q;
+        }
+    }
 }
 
 /*
