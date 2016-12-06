@@ -192,6 +192,7 @@ static inline void checkBlock(ptr p) {
  */
 int mm_init(void) {
     base = mem_sbrk(CHUNKSIZE);
+    end = base + CHUNKSIZE;
     if (base == (void *)-1) return -1;
     NEXT(base) = 8;
     ptr p = PTR(8);
