@@ -89,18 +89,19 @@ static inline void pushBlock(ptr p) {
 static inline ptr allocateBlock(ptr p, size_t size) {
     u32 capcity = SIZE(p);
     if (size + 8 < capcity) {
-        ptr q = p + capcity - size;
-        setTag(q, PACK(size, 1));
-        setTag(p, PACK(capcity - size - 8, 0));
-        return q;
-    } else if (size <= capcity) {
+        ptr q = p + size + 8;
+        NEXT(PTR(PREV(p))) = OFF(q);
+        if (NEXT(p)) PREV(PTR(NEXT(p))) = OFF(q);
+        PREV(q) = PREV(p);
+        NEXT(q) = NEXT(p);
+        setTag(q, PACK(capcity - size - 8, 0));
+        setTag(p, PACK(size, 1));
+    } else {
         deleteBlock(p);
         TAG(p) |= 1;
         ETAG(p) |= 1;
-        return p;
-    } else {
-        return NULL;
     }
+    return p;
 }
 
 static inline ptr coalesceBlock(ptr p) {
