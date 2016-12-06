@@ -150,6 +150,41 @@ static inline ptr findBlock(size_t size) {
     return q;
 }
 
+/*
+ * Return whether the pointer is in the heap.
+ * May be useful for debugging.
+ */
+static inline int in_heap(const void *p) {
+    return p <= mem_heap_hi() && p >= mem_heap_lo();
+}
+
+/*
+ * Return whether the pointer is aligned.
+ * May be useful for debugging.
+ */
+static inline int aligned(const void *p) {
+    return (size_t)ALIGN(p) == (size_t)p;
+}
+
+static inline int checkBlock(ptr p) {
+#ifdef DEBUG
+    assert(aligned(p));
+    assert(in_heap(p));
+    assert(TAG(p) == ETAG(p));
+    if (PREV(p)) {
+        assert(NEXT(PTR(PREV(p))) == OFF(p));
+    } else {
+        assert(NEXT(base) == OFF(p));
+    }
+    if (NEXT(p)) {
+        assert(PREV(PTR(NEXT(p))) == OFF(p));
+        return 0;
+    } else {
+        return 1;
+    }
+#endif
+}
+
 /* end Tiny functions */
 
 /*
@@ -204,25 +239,11 @@ void *calloc (size_t nmemb, size_t size) {
     return ret;
 }
 
-
-/*
- * Return whether the pointer is in the heap.
- * May be useful for debugging.
- */
-static int in_heap(const void *p) {
-    return p <= mem_heap_hi() && p >= mem_heap_lo();
-}
-
-/*
- * Return whether the pointer is aligned.
- * May be useful for debugging.
- */
-static int aligned(const void *p) {
-    return (size_t)ALIGN(p) == (size_t)p;
-}
-
 /*
  * mm_checkheap
  */
 void mm_checkheap(int lineno) {
+    for (ptr p = base + 8; p < end; p = RIGHT(p)) {
+        checkBlock(p);
+    }
 }
