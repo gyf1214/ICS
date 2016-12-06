@@ -217,6 +217,7 @@ void free (void *_p) {
     ptr p = (ptr) _p;
     if(!p) return;
     TAG(p) &= -2;
+    ETAG(p) &= -2;
     p = coalesceBlock(p);
     pushBlock(p);
 }
