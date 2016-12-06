@@ -259,7 +259,7 @@ void *realloc(void *oldptr, size_t size) {
         }
         if (q) {
             allocateBlock(q, more);
-            setTag(p, PACK(size, 1));
+            setTag(p, PACK(capcity + SIZE(q), 1));
             return p;
         } else {
             q = malloc(size);
