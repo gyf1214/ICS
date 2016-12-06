@@ -15,7 +15,7 @@
 
 /* If you want debugging output, use the following macro.  When you hand
  * in, remove the #define DEBUG line. */
-#define DEBUG
+// #define DEBUG
 #ifdef DEBUG
 # define dbg_printf(...) printf(__VA_ARGS__)
 #else
@@ -167,7 +167,6 @@ static inline int aligned(const void *p) {
 }
 
 static inline void checkBlock(ptr p) {
-#ifdef DEBUG
     assert(aligned(p));
     assert(in_heap(p));
     assert(TAG(p) == ETAG(p));
@@ -182,7 +181,6 @@ static inline void checkBlock(ptr p) {
         } else {
         }
     }
-#endif
 }
 
 /* end Tiny functions */
@@ -289,7 +287,9 @@ void *calloc (size_t nmemb, size_t size) {
  * mm_checkheap
  */
 void mm_checkheap(int lineno) {
+#ifdef DEBUG
     for (ptr p = base + 8; p < end; p = RIGHT(p)) {
         checkBlock(p);
     }
+#endif
 }
