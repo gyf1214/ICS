@@ -227,6 +227,10 @@ void free (void *_p) {
  */
 void *realloc(void *oldptr, size_t size) {
     if (!oldptr) return malloc(size);
+    if (!size) {
+        free(oldptr);
+        return NULL;
+    }
     size = ALIGN(size);
     ptr p = (ptr) oldptr;
     u32 capcity = SIZE(p);
