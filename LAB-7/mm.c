@@ -46,14 +46,13 @@ typedef unsigned long u64;
 #define TAG(p)                  (*((u32 *)(p) - 1))
 #define SIZE(p)                 (TAG(p) & (-2))
 #define USED(p)                 (TAG(p) & 1)
-#define ETAG(p)                 (*(u32 *)((char *)(p) + SIZE(p)))
-#define SETTAG(p, x)            TAG(p) = ETAG(p) = (x)
-#define PTR(p)                  (void *)((char *)base + (p))
-#define OFF(p)                  (u32)((char *)(p) - (char *)base)
+#define ETAG(p)                 (*(u32 *)((p) + SIZE(p)))
+#define PTR(p)                  (char *)(base + (p))
+#define OFF(p)                  (u32)((p) - base)
 #define NEXT(p)                 (*(u32 *)(p))
 #define PREV(p)                 (*(u32 *)((p) + 1))
-#define RIGHT(p)                (void *)((char *)(p) + SIZE(p) + 8)
-#define LEFT(p)                 (void *)((char *)(p) - SIZE((u32 *)(p) - 1) - 8)
+#define RIGHT(p)                ((p) + SIZE(p) + 8)
+#define LEFT(p)                 ((p) - SIZE((u32 *)(p) - 1) - 8)
 
 #define CHUNKSIZE               (1 << 12)
 
@@ -61,15 +60,22 @@ typedef unsigned long u64;
 
 /* start Tiny globals */
 
-static void *base;
+static char *base;
 
 /* end Tiny globals */
 
 /* start Tiny functions */
 
-void *extendChunk(size_t size) {
+inline void *extendChunk(size_t size) {
     size = (size + CHUNKSIZE - 1) & (~(CHUNKSIZE - 1));
     return mem_sbrk(size);
+}
+
+inline void setTag(char *p, u32 x) {
+    TAG(p) = x;
+    if (OFF(p) + SIZE(p) < mem_heapsize()) {
+        ETAG(p) = x;
+    }
 }
 
 /* end Tiny functions */
@@ -81,10 +87,9 @@ int mm_init(void) {
     base = extendChunk(CHUNKSIZE);
     if (base == (void *)-1) return -1;
     NEXT(base) = 8;
-    void *p = PTR(8);
-    TAG(p) = PACK(CHUNKSIZE - 8, 0);
-    PREV(p) = OFF(NULL);
-    NEXT(p) = OFF(NULL);
+    char *p = PTR(8);
+    setTag(p, PACK(CHUNKSIZE - 8, 0));
+    PREV(p) = NEXT(p) = 0;
     return 0;
 }
 
