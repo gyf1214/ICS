@@ -129,7 +129,7 @@ static inline ptr coalesceBlock(ptr p) {
 static inline ptr extendChunk(size_t size) {
     size = (size + 8 + CHUNKSIZE - 1) & (~(CHUNKSIZE - 1));
     ptr p = mem_sbrk(size);
-    setTag(p, PACK(CHUNKSIZE - 8, 0));
+    setTag(p, PACK(size - 8, 0));
     end = p + size;
     p = coalesceBlock(p);
     pushBlock(p);
