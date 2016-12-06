@@ -79,11 +79,15 @@ static inline void deleteBlock(ptr p) {
 }
 
 static inline void pushBlock(ptr p) {
-    ptr q = PTR(NEXT(base));
-    PREV(q) = OFF(p);
-    NEXT(base) = OFF(p);
+    if (NEXT(base)) {
+        ptr q = PTR(NEXT(base));
+        PREV(q) = OFF(p);
+        NEXT(p) = OFF(q);
+    } else {
+        NEXT(p) = 0;
+    }
     PREV(p) = 0;
-    NEXT(p) = OFF(q);
+    NEXT(base) = OFF(p);
 }
 
 static inline ptr allocateBlock(ptr p, size_t size) {
@@ -133,7 +137,6 @@ static inline ptr extendChunk(size_t size) {
 }
 
 static inline ptr findBlock(size_t size) {
-    size = ALIGN(size);
     ptr q = NULL;
     for (ptr p = base; NEXT(p); p = q) {
         q = PTR(NEXT(p));
