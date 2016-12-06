@@ -166,21 +166,21 @@ static inline int aligned(const void *p) {
     return (size_t)ALIGN(p) == (size_t)p;
 }
 
-static inline int checkBlock(ptr p) {
+static inline void checkBlock(ptr p) {
 #ifdef DEBUG
     assert(aligned(p));
     assert(in_heap(p));
     assert(TAG(p) == ETAG(p));
-    if (PREV(p)) {
-        assert(NEXT(PTR(PREV(p))) == OFF(p));
-    } else {
-        assert(NEXT(base) == OFF(p));
-    }
-    if (NEXT(p)) {
-        assert(PREV(PTR(NEXT(p))) == OFF(p));
-        return 0;
-    } else {
-        return 1;
+    if (!USED(p)) {
+        if (PREV(p)) {
+            assert(NEXT(PTR(PREV(p))) == OFF(p));
+        } else {
+            assert(NEXT(base) == OFF(p));
+        }
+        if (NEXT(p)) {
+            assert(PREV(PTR(NEXT(p))) == OFF(p));
+        } else {
+        }
     }
 #endif
 }
