@@ -39,6 +39,7 @@
 
 /* start Tiny defines */
 
+typedef char *ptr;
 typedef unsigned int u32;
 typedef unsigned long u64;
 
@@ -47,10 +48,10 @@ typedef unsigned long u64;
 #define SIZE(p)                 (TAG(p) & (-2))
 #define USED(p)                 (TAG(p) & 1)
 #define ETAG(p)                 (*(u32 *)((p) + SIZE(p)))
-#define PTR(p)                  (char *)(base + (p))
+#define PTR(p)                  (ptr)(base + (p))
 #define OFF(p)                  (u32)((p) - base)
 #define NEXT(p)                 (*(u32 *)(p))
-#define PREV(p)                 (*(u32 *)((p) + 1))
+#define PREV(p)                 (*((u32 *)(p) + 1))
 #define RIGHT(p)                ((p) + SIZE(p) + 8)
 #define LEFT(p)                 ((p) - SIZE((u32 *)(p) - 1) - 8)
 
@@ -60,22 +61,89 @@ typedef unsigned long u64;
 
 /* start Tiny globals */
 
-static char *base;
+static ptr base;
+static ptr end;
 
 /* end Tiny globals */
 
 /* start Tiny functions */
 
-static inline void *extendChunk(size_t size) {
-    size = (size + CHUNKSIZE - 1) & (~(CHUNKSIZE - 1));
-    return mem_sbrk(size);
+static inline void setTag(ptr p, u32 x) {
+    TAG(p) = x;
+    ETAG(p) = x;
 }
 
-static inline void setTag(char *p, u32 x) {
-    TAG(p) = x;
-    if (OFF(p) + SIZE(p) < mem_heapsize()) {
-        ETAG(p) = x;
+static inline void deleteBlock(ptr p) {
+    NEXT(PTR(PREV(p))) = NEXT(p);
+    if (NEXT(p)) PREV(PTR(NEXT(p))) = PREV(p);
+}
+
+static inline void pushBlock(ptr p) {
+    ptr q = PTR(NEXT(base));
+    PREV(q) = OFF(p);
+    NEXT(base) = OFF(p);
+    PREV(p) = 0;
+    NEXT(p) = OFF(q);
+}
+
+static inline ptr allocateBlock(ptr p, size_t size) {
+    u32 capcity = SIZE(p);
+    if (size + 8 < capcity) {
+        ptr q = p + capcity - size;
+        setTag(q, PACK(size, 1));
+        setTag(p, PACK(capcity - size - 8, 0));
+        return q;
+    } else if (size <= capcity) {
+        deleteBlock(p);
+        TAG(p) |= 1;
+        ETAG(p) |= 1;
+        return p;
+    } else {
+        return NULL;
     }
+}
+
+static inline ptr coalesceBlock(ptr p) {
+    ptr q;
+    if (p > base + 8) {
+        q = LEFT(p);
+        if (!USED(q)) {
+            deleteBlock(q);
+            setTag(q, PACK(SIZE(p) + SIZE(q) + 8, 0));
+            p = q;
+        }
+    }
+    q = RIGHT(p);
+    if (q < end && !USED(q)) {
+        deleteBlock(q);
+        setTag(p, PACK(SIZE(p) + SIZE(q) + 8, 0));
+    }
+    return p;
+}
+
+static inline ptr extendChunk(size_t size) {
+    size = (size + CHUNKSIZE - 1) & (~(CHUNKSIZE - 1));
+    ptr p = mem_sbrk(size);
+    setTag(p, PACK(CHUNKSIZE - 8, 0));
+    end = p + size;
+    p = coalesceBlock(p);
+    pushBlock(p);
+    return p;
+}
+
+static inline ptr findBlock(size_t size) {
+    size = ALIGN(size);
+    ptr q = NULL;
+    for (ptr p = base; NEXT(p); p = q) {
+        q = PTR(NEXT(p));
+        if (SIZE(q) >= size) {
+            break;
+        }
+    }
+    if (!q || SIZE(q) < size) {
+        q = extendChunk(size);
+    }
+    return q;
 }
 
 /* end Tiny functions */
@@ -84,11 +152,11 @@ static inline void setTag(char *p, u32 x) {
  * Initialize: return -1 on error, 0 on success.
  */
 int mm_init(void) {
-    base = extendChunk(CHUNKSIZE);
+    base = mem_sbrk(CHUNKSIZE);
     if (base == (void *)-1) return -1;
     NEXT(base) = 8;
-    char *p = PTR(8);
-    setTag(p, PACK(CHUNKSIZE - 8, 0));
+    ptr p = PTR(8);
+    setTag(p, PACK(CHUNKSIZE - 16, 0));
     PREV(p) = NEXT(p) = 0;
     return 0;
 }
@@ -97,21 +165,28 @@ int mm_init(void) {
  * malloc
  */
 void *malloc (size_t size) {
-    return NULL;
+    size = ALIGN(size);
+    ptr p = findBlock(size);
+    return allocateBlock(p, size);
 }
 
 /*
  * free
  */
-void free (void *ptr) {
-    if(!ptr) return;
+void free (void *_p) {
+    ptr p = (ptr) _p;
+    if(!p) return;
+    TAG(p) &= -2;
+    p = coalesceBlock(p);
+    pushBlock(p);
 }
 
 /*
  * realloc - you may want to look at mm-naive.c
  */
 void *realloc(void *oldptr, size_t size) {
-    return NULL;
+    free(oldptr);
+    return malloc(size);
 }
 
 /*
@@ -120,7 +195,9 @@ void *realloc(void *oldptr, size_t size) {
  * needed to run the traces.
  */
 void *calloc (size_t nmemb, size_t size) {
-    return NULL;
+    void *ret = malloc(nmemb * size);
+    memset(ret, 0, nmemb * size);
+    return ret;
 }
 
 
