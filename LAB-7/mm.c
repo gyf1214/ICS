@@ -66,12 +66,12 @@ static char *base;
 
 /* start Tiny functions */
 
-inline void *extendChunk(size_t size) {
+static inline void *extendChunk(size_t size) {
     size = (size + CHUNKSIZE - 1) & (~(CHUNKSIZE - 1));
     return mem_sbrk(size);
 }
 
-inline void setTag(char *p, u32 x) {
+static inline void setTag(char *p, u32 x) {
     TAG(p) = x;
     if (OFF(p) + SIZE(p) < mem_heapsize()) {
         ETAG(p) = x;
