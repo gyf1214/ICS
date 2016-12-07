@@ -55,7 +55,7 @@ typedef unsigned long u64;
 #define RIGHT(p)                ((p) + SIZE(p) + 8)
 #define LEFT(p)                 ((p) - SIZE((u32 *)(p) - 1) - 8)
 
-#define CHUNKSIZE               (1 << 10)
+#define CHUNKSIZE               (8)
 
 /* end Tiny defines */
 
