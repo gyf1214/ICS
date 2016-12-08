@@ -27,3 +27,5 @@ clock.o: clock.c clock.h
 
 clean:
 	rm -f *~ *.o mdriver
+
+.PHONY: clean debug product all
