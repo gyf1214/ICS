@@ -182,11 +182,11 @@ static ptr allocateBlock(ptr p, u32 size) {
 
 /* extend heap and return the new block */
 static ptr extendHeap(u32 size) {
-    size = ALIGN(size, CHUNKSIZE);
+    size = ALIGN(size + 8, CHUNKSIZE);
 
     /* increase heap size */
-    ptr p = mem_sbrk(size + 8);
-    setTag(p, PACK(size, 0));
+    ptr p = mem_sbrk(size);
+    setTag(p, PACK(size - 8, 0));
     /* epilogue */
     TAG(RIGHT(p)) = 1;
     /* insert into seg list */
