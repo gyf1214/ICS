@@ -320,6 +320,8 @@ void *malloc(size_t _size) {
 void free(void *_p) {
     ptr p = (ptr) _p;
 
+    if (!p) return;
+
     /* unset USED */
     TAG(p) &= -2;
     ETAG(p) &= -2;
