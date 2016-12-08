@@ -282,23 +282,19 @@ static void checkList(int k) {
  * CAUTION: You must reset all of your global pointers here.
  */
 int mm_init(void) {
-    /* allocate first chunk */
-    base = mem_sbrk(CHUNKSIZE);
+    /* allocate seg list */
+    u32 headSize = LISTCNT * sizeof(ptr) + 8;
+    base = mem_sbrk(headSize);
     if (base == (ptr) -1) return -1;
 
     /* head of the seg list */
     for (int i = 0; i < LISTCNT; ++i) NEXT(LIST(i)) = NULL;
 
-    /* first block */
-    u32 headSize = LISTCNT * sizeof(ptr) + 8;
     ptr p = base + headSize;
-    u32 size = CHUNKSIZE - headSize - 8;
-    setTag(p, PACK(size, 0));
-    insertBlock(p);
     /* prologue */
     LTAG(p) = 1;
     /* epilogue */
-    TAG(RIGHT(p)) = 1;
+    TAG(p) = 1;
 
     return 0;
 }
