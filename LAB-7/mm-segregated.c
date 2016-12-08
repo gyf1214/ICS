@@ -61,7 +61,7 @@ typedef unsigned long u64, *p64;
 #define NEXT(p)                 (*(pptr)(p))
 #define PREV(p)                 (*((pptr)(p) + 1))
 
-#define CHUNKSIZE               (1 << 4)
+#define CHUNKSIZE               (1 << 6)
 
 #define MINSIZE                 16
 #define LISTCNT                 9
