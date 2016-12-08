@@ -308,6 +308,9 @@ int mm_init(void) {
  *      Always allocate a block whose size is a multiple of the alignment.
  */
 void *malloc(size_t _size) {
+    /* trival */
+    if (!_size) return NULL;
+
     u32 size = align(_size);
     ptr p = findBlock(size);
     return allocateBlock(p, size);
@@ -336,15 +339,15 @@ void free(void *_p) {
  *      to do better.
  */
 void *realloc(void *old, size_t _size) {
-    ptr p = (ptr)old;
-    u32 size = align(_size);
-
     /* trival situation */
-    if (!p) return malloc(size);
-    if (size == 0) {
-        free(p);
+    if (!_size) {
+        free(old);
         return NULL;
     }
+    if (!old) return malloc(_size);
+
+    ptr p = (ptr)old;
+    u32 size = align(_size);
 
     /* try to resize the block */
     ptr q = resizeBlock(p, size);
