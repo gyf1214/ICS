@@ -182,7 +182,7 @@ static ptr allocateBlock(ptr p, u32 size) {
 
 /* extend heap and return the new block */
 static ptr extendHeap(u32 size) {
-    if (size < CHUNKSIZE) size = CHUNKSIZE;
+    size = ALIGN(size, CHUNKSIZE);
 
     /* increase heap size */
     ptr p = mem_sbrk(size + 8);
