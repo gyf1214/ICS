@@ -92,7 +92,7 @@ static inline void setTag(ptr p, u32 tag) {
 
 /* find the seg index of size */
 static inline u32 getIndex(u32 size) {
-    ASSERT(k >= MINSIZE);
+    ASSERT(size >= MINSIZE);
 
     u32 k = 0;
     for (size /= MINSIZE; size && k < LISTCNT; size /= 2) ++k;
@@ -243,6 +243,40 @@ static ptr resizeBlock(ptr p, u32 size) {
 
 /* end Tiny functions */
 
+/* start Tiny debug */
+
+#ifdef DEBUG
+
+static inline int aligned(ptr p) {
+    return (u32)p == ALIGN((u32)p, 8);
+}
+
+static inline int inHeap(ptr p) {
+    return p <= (ptr)mem_heap_hi() && p >= (ptr)mem_heap_lo();
+}
+
+/* check a general block */
+static void checkBlock(ptr p) {
+    ASSERT(inHeap(p));
+    ASSERT(aligned(p));
+    ASSERT(TAG(p) == ETAG(p));
+}
+
+/* check free list */
+static void checkList(int k) {
+    for (ptr p = LIST(k), q = NEXT(p); q; p = q, q = NEXT(q)) {
+        ASSERT(NEXT(p) == q);
+        ASSERT(PREV(q) == p);
+        ASSERT(!USED(q));
+        ASSERT(SIZE(q) / MINSIZE >= (1 << k));
+        if (k < LISTCNT - 1) ASSERT(SIZE(q) / MINSIZE < (2 << k));
+    }
+}
+
+#endif
+
+/* end Tiny debug */
+
 /*
  * mm_init - Called when a new trace starts.
  * CAUTION: You must reset all of your global pointers here.
@@ -341,4 +375,13 @@ void *calloc(size_t nmemb, size_t size)
  *      mm_checkheap(__LINE__) to identify the call site.)
  */
 void mm_checkheap(int lineno){
+#ifdef DEBUG
+    ptr p = base + LISTCNT * sizeof(ptr) + 8;
+    /* epilogue */
+    ASSERT(LTAG(p) == 1);
+    /* check blocks */
+    for (; TAG(p) != 1; p = RIGHT(p)) checkBlock(p);
+
+    for (int k = 0; k < LISTCNT; ++k) checkList(k);
+#endif
 }
