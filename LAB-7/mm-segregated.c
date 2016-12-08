@@ -113,8 +113,14 @@ static void insertBlock(ptr p) {
     u32 size = SIZE(p);
     u32 k = getIndex(size);
 
-    /* insert to head */
+    // /* insert to head */
+    // ptr q = LIST(k);
+
+    /* insert so that the list is sorted */
     ptr q = LIST(k);
+    for (; NEXT(q); q = NEXT(q)) {
+        if (SIZE(NEXT(q)) >= size) break;
+    }
     PREV(p) = q;
     NEXT(p) = NEXT(q);
     if (NEXT(q)) PREV(NEXT(q)) = p;
