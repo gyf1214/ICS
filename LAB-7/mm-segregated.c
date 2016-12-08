@@ -165,7 +165,7 @@ static ptr allocateBlock(ptr p, u32 size) {
     u32 fullSize = SIZE(p);
     ASSERT(fullSize >= size);
 
-    u32 remainder = fullSize - size - 8;
+    int remainder = fullSize - size - 8;
     if (remainder >= MINSIZE) {
         /* split */
         ptr q = p + size + 8;
@@ -217,7 +217,7 @@ static ptr findBlock(u32 size) {
 
 /* resize a block to size, returns NULL when fails */
 static ptr resizeBlock(ptr p, u32 size) {
-    u32 more = size - SIZE(p);
+    int more = size - SIZE(p);
 
     /* if RIGHT(p) is not USED */
     ptr q = RIGHT(p);
