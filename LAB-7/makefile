@@ -9,10 +9,10 @@ OBJS = mdriver.o mm.o memlib.o fsecs.o fcyc.o clock.o ftimer.o
 all: debug
 
 debug: CFLAGS += -DDEBUG
-debug: mdriver
+debug: clean mdriver
 
 product: CFLAGS += -O3
-product: mdriver
+product: clean mdriver
 
 mdriver: $(OBJS)
 	$(CC) $(CFLAGS) -o mdriver $(OBJS)
