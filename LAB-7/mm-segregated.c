@@ -268,8 +268,8 @@ static void checkList(int k) {
         ASSERT(NEXT(p) == q);
         ASSERT(PREV(q) == p);
         ASSERT(!USED(q));
-        ASSERT(SIZE(q) / MINSIZE >= (1 << k));
-        if (k < LISTCNT - 1) ASSERT(SIZE(q) / MINSIZE < (2 << k));
+        ASSERT(SIZE(q) / MINSIZE >= (1u << k));
+        if (k < LISTCNT - 1) ASSERT(SIZE(q) / MINSIZE < (2u << k));
     }
 }
 
