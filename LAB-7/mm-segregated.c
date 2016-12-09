@@ -58,14 +58,16 @@ typedef unsigned long u64, *p64;
 #define LUSED(p)                (LTAG(p) & 1)
 #define RIGHT(p)                ((p) + SIZE(p) + 8)
 #define LEFT(p)                 ((p) - LSIZE(p) - 8)
-#define NEXT(p)                 (*(pptr)(p))
-#define PREV(p)                 (*((pptr)(p) + 1))
+#define NEXT(p)                 (*(p32)(p))
+#define PREV(p)                 (*((p32)(p) + 1))
+#define PTR(p)                  (base + (p))
+#define OFF(p)                  ((p) - base)
 
 #define CHUNKSIZE               (1 << 10)
 
-#define MINSIZE                 16
+#define MINSIZE                 8
 #define LISTCNT                 20
-#define LIST(i)                 ((ptr)((pptr)(base) + (i)))
+#define LIST(i)                 ((ptr)((p32)(base) + (i)))
 
 #ifdef DEBUG
 #define ASSERT(x) assert(x)
@@ -118,21 +120,21 @@ static void insertBlock(ptr p) {
 
     /* insert so that the list is sorted */
     ptr q = LIST(k);
-    for (; NEXT(q); q = NEXT(q)) {
-        if (SIZE(NEXT(q)) >= size) break;
+    for (; NEXT(q); q = PTR(NEXT(q))) {
+        if (SIZE(PTR(NEXT(q))) >= size) break;
     }
-    PREV(p) = q;
+    PREV(p) = OFF(q);
     NEXT(p) = NEXT(q);
-    if (NEXT(q)) PREV(NEXT(q)) = p;
-    NEXT(q) = p;
+    if (NEXT(q)) PREV(PTR(NEXT(q))) = OFF(p);
+    NEXT(q) = OFF(p);
 }
 
 /* delete a free block from the seg list */
 static void deleteBlock(ptr p) {
     ASSERT(!USED(p));
 
-    NEXT(PREV(p)) = NEXT(p);
-    if (NEXT(p)) PREV(NEXT(p)) = PREV(p);
+    NEXT(PTR(PREV(p))) = NEXT(p);
+    if (NEXT(p)) PREV(PTR(NEXT(p))) = PREV(p);
 }
 
 /* merge p and RIGHT(p), remain USED of p */
@@ -207,7 +209,7 @@ static ptr findBlock(u32 size) {
     int k = getIndex(size);
     ptr p = NULL;
     for (; !p && k < LISTCNT; ++k) {
-        for (p = NEXT(LIST(k)); p; p = NEXT(p)) {
+        for (p = PTR(NEXT(LIST(k))); p; p = PTR(NEXT(p))) {
             if (SIZE(p) >= size) break;
         }
     }
@@ -294,7 +296,7 @@ int mm_init(void) {
     if (base == (ptr) -1) return -1;
 
     /* head of the seg list */
-    for (int i = 0; i < LISTCNT; ++i) NEXT(LIST(i)) = NULL;
+    for (int i = 0; i < LISTCNT; ++i) NEXT(LIST(i)) = 0;
 
     ptr p = base + headSize;
     /* prologue */
