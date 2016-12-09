@@ -272,7 +272,7 @@ static void checkBlock(ptr p) {
 
 /* check free list */
 static void checkList(int k) {
-    for (ptr p = LIST(k), q = NEXT(p); q; p = q, q = NEXT(q)) {
+    for (ptr p = LIST(k), q = PTR(NEXT(p)); q; p = q, q = PTR(NEXT(q))) {
         ASSERT(PTR(NEXT(p)) == q);
         ASSERT(PTR(PREV(q)) == p);
         ASSERT(!USED(q));
