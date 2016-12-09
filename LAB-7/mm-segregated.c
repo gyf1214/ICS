@@ -61,13 +61,13 @@ typedef unsigned long u64, *p64;
 #define NEXT(p)                 (*(p32)(p))
 #define PREV(p)                 (*((p32)(p) + 1))
 #define PTR(p)                  ((p) ? (base + (p)) : NULL)
-#define OFF(p)                  ((p) - base)
+#define OFF(p)                  ((p) ? ((p) - base) : 0)
 
 #define CHUNKSIZE               (1 << 10)
 
 #define MINSIZE                 8
 #define LISTCNT                 20
-#define LIST(i)                 ((ptr)((p32)(base) + (i)))
+#define LIST(i)                 ((ptr)((p32)(base) + (i) + 1))
 
 #ifdef DEBUG
 #define ASSERT(x) assert(x)
@@ -291,12 +291,12 @@ static void checkList(int k) {
  */
 int mm_init(void) {
     /* allocate seg list */
-    u32 headSize = LISTCNT * sizeof(ptr) + 8;
+    u32 headSize = LISTCNT * sizeof(ptr) + 16;
     base = mem_sbrk(headSize);
     if (base == (ptr) -1) return -1;
 
     /* head of the seg list */
-    for (int i = 0; i < LISTCNT; ++i) NEXT(LIST(i)) = 0;
+    for (int i = 0; i < LISTCNT; ++i) NEXT(LIST(i)) = OFF((ptr)NULL);
 
     ptr p = base + headSize;
     /* prologue */
