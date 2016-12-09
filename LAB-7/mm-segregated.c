@@ -273,8 +273,8 @@ static void checkBlock(ptr p) {
 /* check free list */
 static void checkList(int k) {
     for (ptr p = LIST(k), q = NEXT(p); q; p = q, q = NEXT(q)) {
-        ASSERT(NEXT(p) == q);
-        ASSERT(PREV(q) == p);
+        ASSERT(PTR(NEXT(p)) == q);
+        ASSERT(PTR(PREV(q)) == p);
         ASSERT(!USED(q));
         ASSERT(SIZE(q) / MINSIZE >= (1u << k));
         if (k < LISTCNT - 1) ASSERT(SIZE(q) / MINSIZE < (2u << k));
