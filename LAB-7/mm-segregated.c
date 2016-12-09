@@ -60,7 +60,7 @@ typedef unsigned long u64, *p64;
 #define LEFT(p)                 ((p) - LSIZE(p) - 8)
 #define NEXT(p)                 (*(p32)(p))
 #define PREV(p)                 (*((p32)(p) + 1))
-#define PTR(p)                  (base + (p))
+#define PTR(p)                  ((p) ? (base + (p)) : NULL)
 #define OFF(p)                  ((p) - base)
 
 #define CHUNKSIZE               (1 << 10)
