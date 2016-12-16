@@ -117,8 +117,7 @@ static inline u32 getIndex(u32 size) {
 
 /* align to 8 byte and al least MINSIZE */
 static inline u32 align(u32 p) {
-    p -= 4;
-    if (p < MINSIZE) p = MINSIZE;
+    p = p < MINSIZE + 4 ? MINSIZE : p - 4;
     return ALIGN(p, ALIGNMENT);
 }
 
