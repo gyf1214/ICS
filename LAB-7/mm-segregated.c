@@ -58,7 +58,7 @@ typedef unsigned long u64, *p64;
 #define CHUNKSIZE               (1 << 10)
 
 #define MINSIZE                 8
-#define LISTCNT                 5
+#define LISTCNT                 12
 #define LIST(i)                 ((ptr)((p32)(base) + (i) + 1))
 
 #ifdef DEBUG
