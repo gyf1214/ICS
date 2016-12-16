@@ -55,7 +55,7 @@ typedef unsigned long u64, *p64;
 #define PTR(p)                  ((p) ? (base + (p)) : NULL)
 #define OFF(p)                  ((p) ? ((p) - base) : 0)
 
-#define CHUNKSIZE               (1 << 9)
+#define CHUNKSIZE               (1 << 10)
 
 #define MINSIZE                 8
 #define LISTCNT                 20
