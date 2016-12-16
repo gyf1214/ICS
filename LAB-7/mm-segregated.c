@@ -135,7 +135,7 @@ static void insertBlock(ptr p) {
     /* insert so that the list is sorted */
     ptr q = LIST(k);
     for (; NEXT(q); q = PTR(NEXT(q))) {
-        if (SIZE(PTR(NEXT(q))) >= size) break;
+        if (PTR(NEXT(q)) > p) break;
     }
     PREV(p) = OFF(q);
     NEXT(p) = NEXT(q);
