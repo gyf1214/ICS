@@ -42,12 +42,12 @@ typedef unsigned long u64, *p64;
 
 #define PACK(size, used)        ((size) | (used))
 #define TAG(p)                  (*((p32)(p) - 1))
-#define SIZE(p)                 (TAG(p) & (-2))
+#define SIZE(p)                 (TAG(p) & (-4))
 #define USED(p)                 (TAG(p) & 1)
+#define LUSED(p)                (TAG(p) & 2)
 #define ETAG(p)                 (*(p32)((p) + SIZE(p)))
 #define LTAG(p)                 (*((p32)(p) - 2))
-#define LSIZE(p)                (LTAG(p) & (-2))
-#define LUSED(p)                (LTAG(p) & 1)
+#define LSIZE(p)                (LTAG(p) & (-4))
 #define RIGHT(p)                ((p) + SIZE(p) + 8)
 #define LEFT(p)                 ((p) - LSIZE(p) - 8)
 #define NEXT(p)                 (*(p32)(p))
@@ -78,10 +78,32 @@ static ptr base;
 
 /* start Tiny functions */
 
+/* keep USED(p) = LUSED(RIGHT(p)) */
+static inline void updateLUsed(ptr p) {
+    TAG(RIGHT(p)) &= -3;
+    TAG(RIGHT(p)) |= (USED(p) << 1);
+}
+
 /* set TAG of a block both at head & foot */
 static inline void setTag(ptr p, u32 tag) {
     TAG(p) = tag;
-    ETAG(p) = tag;
+    if (!USED(p)) ETAG(p) = tag & (-4);
+    updateLUsed(p);
+}
+
+/* set size, keep used & lused */
+static inline void setSize(ptr p, u32 size) {
+    u32 bits = TAG(p) & 3;
+    size |= bits;
+    TAG(p) = size;
+    if (!USED(p)) ETAG(p) = size;
+}
+
+/* mark an unused block */
+static inline void unsetUsed(ptr p) {
+    TAG(p) &= -2;
+    updateLUsed(p);
+    ETAG(p) = SIZE(p);
 }
 
 /* find the seg index of size */
@@ -95,8 +117,9 @@ static inline u32 getIndex(u32 size) {
 
 /* align to 8 byte and al least MINSIZE */
 static inline u32 align(u32 p) {
-    p = ALIGN(p, ALIGNMENT);
-    return p < MINSIZE ? MINSIZE : p;
+    p -= 4;
+    if (p < MINSIZE) p = MINSIZE;
+    return ALIGN(p, ALIGNMENT);
 }
 
 /* insert a free block into the seg list */
@@ -129,17 +152,17 @@ static void deleteBlock(ptr p) {
     if (NEXT(p)) PREV(PTR(NEXT(p))) = PREV(p);
 }
 
-/* merge p and RIGHT(p), remain USED of p */
+/* merge p and RIGHT(p), remain USED & LUSED of p */
 static ptr mergeBlock(ptr p) {
     ptr q = RIGHT(p);
 
     /* RIGHT(p) cannot be USED! */
     ASSERT(!USED(q));
 
-    u32 used = USED(p);
     u32 size = SIZE(p) + SIZE(q) + 8;
     deleteBlock(q);
-    setTag(p, PACK(size, used));
+    setSize(p, size);
+    updateLUsed(p);
 
     return p;
 }
@@ -163,18 +186,19 @@ static ptr allocateBlock(ptr p, u32 size) {
     if (!USED(p)) deleteBlock(p);
 
     u32 fullSize = SIZE(p);
+    u32 lused = LUSED(p);
     ASSERT(fullSize >= size);
 
     int remainder = fullSize - size - 8;
     if (remainder >= MINSIZE) {
         /* split */
         ptr q = p + size + 8;
-        setTag(q, PACK(remainder, 0));
-        setTag(p, PACK(size, 1));
+        setTag(p, PACK(size, 1 | lused));
+        setTag(q, PACK(remainder, 2));
         insertBlock(q);
     } else {
         /* simply gives the whole block */
-        setTag(p, PACK(fullSize, 1));
+        setTag(p, PACK(fullSize, 1 | lused));
     }
 
     return p;
@@ -186,7 +210,8 @@ static ptr extendHeap(u32 size) {
 
     /* increase heap size */
     ptr p = mem_sbrk(size);
-    setTag(p, PACK(size - 8, 0));
+    u32 lused = LUSED(p);
+    setTag(p, PACK(size - 8, lused));
     /* epilogue */
     TAG(RIGHT(p)) = 1;
     /* insert into seg list */
@@ -231,10 +256,11 @@ static ptr resizeBlock(ptr p, u32 size) {
     if (more <= 0) return allocateBlock(p, size);
 
     /* if p is the most right block */
-    if (TAG(RIGHT(p)) == 1) {
+    if (!SIZE(RIGHT(p))) {
         /* we can extend the heap and merge the new area */
         extendHeap(more - 8);
-        return mergeBlock(p);
+        p = mergeBlock(p);
+        return allocateBlock(p, size);
     }
 
     /* sadly fails */
@@ -259,7 +285,10 @@ static inline int inHeap(ptr p) {
 static void checkBlock(ptr p) {
     ASSERT(inHeap(p));
     ASSERT(aligned(p));
-    ASSERT(TAG(p) == ETAG(p));
+    if (!USED(p)) {
+        ASSERT(SIZE(p) == ETAG(p));
+    }
+    ASSERT(LUSED(RIGHT(p)) == (USED(p) << 1));
 }
 
 /* check free list */
@@ -294,7 +323,7 @@ int mm_init(void) {
     /* prologue */
     LTAG(p) = 1;
     /* epilogue */
-    TAG(p) = 1;
+    TAG(p) = 3;
 
     return 0;
 }
@@ -322,8 +351,7 @@ void free(void *_p) {
     if (!p) return;
 
     /* unset USED */
-    TAG(p) &= -2;
-    ETAG(p) &= -2;
+    unsetUsed(p);
     insertBlock(p);
     /* coalesce */
     coalesceBlock(p);
@@ -378,10 +406,11 @@ void *calloc(size_t nmemb, size_t size)
 void mm_checkheap(int lineno){
 #ifdef DEBUG
     ptr p = base + LISTCNT * sizeof(ptr) + 8;
-    /* epilogue */
+    /* prologue */
     ASSERT(LTAG(p) == 1);
+    ASSERT(LUSED(p));
     /* check blocks */
-    for (; TAG(p) != 1; p = RIGHT(p)) checkBlock(p);
+    for (; SIZE(p); p = RIGHT(p)) checkBlock(p);
 
     for (int k = 0; k < LISTCNT; ++k) checkList(k);
 #endif

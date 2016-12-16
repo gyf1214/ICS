@@ -6,7 +6,7 @@ CFLAGS = -Wall -Wextra -g -DDRIVER -std=gnu99 -Wno-unused-function -Wno-unused-p
 
 OBJS = mdriver.o mm.o memlib.o fsecs.o fcyc.o clock.o ftimer.o
 
-all: product
+all: debug
 
 debug: CFLAGS += -DDEBUG
 debug: clean mdriver
