@@ -58,7 +58,7 @@ typedef unsigned long u64, *p64;
 #define CHUNKSIZE               (1 << 10)
 
 #define MINSIZE                 8
-#define LISTCNT                 20
+#define LISTCNT                 10
 #define LIST(i)                 ((ptr)((p32)(base) + (i) + 1))
 
 #ifdef DEBUG
@@ -135,7 +135,7 @@ static void insertBlock(ptr p) {
     /* insert so that the list is sorted */
     ptr q = LIST(k);
     for (; NEXT(q); q = PTR(NEXT(q))) {
-        if (PTR(NEXT(q)) > p) break;
+        if (SIZE(PTR(NEXT(q))) >= size) break;
     }
     PREV(p) = OFF(q);
     NEXT(p) = NEXT(q);
