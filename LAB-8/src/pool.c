@@ -49,7 +49,7 @@ static void readFD(int fd) {
         debug("read chunksize %d from %d", n, fd);
         pool.handler[fd](fd, n, buf);
     } else {
-        if (n < 0) warn("read failed(%d)", errno);
+        if (n < 0) excp("read failed");
         debug("get nothing, error or EOF, close %d", fd);
         closeFD(fd);
     }
@@ -63,7 +63,7 @@ void eventLoop() {
         pool.readySet = pool.listenSet;
         int ret = select(pool.nfds, &pool.readySet, NULL, NULL, &pool.timeout);
         if (ret < 0) {
-            error("select failed(%d)", errno);
+            fatal("select failed");
         } else if (ret) {
             int fd;
             for (fd = 0; fd < pool.nfds; ++fd) {

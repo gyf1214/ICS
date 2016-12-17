@@ -6,16 +6,18 @@
 #include <assert.h>
 
 #ifdef DEBUG
-#define log(format, ...)    fprintf(stderr, "[%s: %d] " format "\n", __FILE__, __LINE__,##__VA_ARGS__)
-#define debug(...)          log(__VA_ARGS__)
-#define require(x)          assert(x)
+#define log(level, format, ...) fprintf(stderr, "[%s](%s: %d) " format "\n", level, __FILE__, __LINE__,##__VA_ARGS__)
+#define debug(...)              log("debug", __VA_ARGS__)
+#define require(x)              assert(x)
 #else
-#define log(format, ...)    fprintf(stderr, format "\n",##__VA_ARGS__)
+#define log(level, format, ...) fprintf(stderr, "[%s] " format "\n", level,##__VA_ARGS__)
 #define debug(...)
 #define require(x)
 #endif
 
-#define warn(...)           log(__VA_ARGS__)
-#define error(...)          log(__VA_ARGS__), exit(-1)
+#define warn(...)           log("warn", __VA_ARGS__)
+#define excp(format, ...)   warn(format " %s(%d)",##__VA_ARGS__, strerror(errno), errno)
+#define error(...)          log("error", __VA_ARGS__), exit(-1)
+#define fatal(format, ...)  error(format " %s(%d)",##__VA_ARGS__, strerror(errno), errno)
 
 #endif
