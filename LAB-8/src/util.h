@@ -7,7 +7,7 @@
 #include <sys/errno.h>
 
 #ifdef DEBUG
-#define log(level, format, ...) fprintf(stderr, "[%s](%s: %d)\t" format "\n", level, __FILE__, __LINE__,##__VA_ARGS__)
+#define log(level, format, ...) fprintf(stderr, "[%s](%s: %d) " format "\n", level, __FILE__, __LINE__,##__VA_ARGS__)
 #define debug(...)              log("debug", __VA_ARGS__)
 #define require(x)              assert(x)
 #else
