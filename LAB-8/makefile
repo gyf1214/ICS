@@ -1,0 +1,31 @@
+#
+# Makefile for Proxy Lab
+#
+# You may modify is file any way you like (except for the handin
+# rule). Autolab will execute the command "make" on your specific
+# Makefile to build your proxy from sources.
+#
+CC = gcc
+CFLAGS = -g -Wall -DDEBUG
+LDFLAGS = -lpthread
+
+LIBS = proxy.o pool.o
+OBJS = $(LIBS) main.o
+
+all : proxy
+
+$(LIBS) : %.o : src/%.h
+
+proxy : $(OBJS)
+	$(CC) $(CFLAGS) $(LDFLAGS) proxy.o csapp.o -o proxy
+
+%.o : src/%.c src/util.h makefile
+	$(CC) -c $(CFLAGS) -o $@ $<
+
+# Creates a tarball in ../proxylab-handin.tar that you should then
+# hand in to Autolab.
+
+handin:
+
+clean:
+	rm -f *~ *.o proxy core *.tar *.zip *.gzip *.bzip *.gz
