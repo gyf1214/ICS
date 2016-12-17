@@ -11,5 +11,7 @@
 #define HTTP        "http://"
 #define HTTPPort    "80"
 #define HTTPVer     "HTTP/1.0"
+#define stdlog      logFile
+#define logPath     "proxy.log"
 
 #endif

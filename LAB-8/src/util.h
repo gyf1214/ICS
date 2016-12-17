@@ -5,13 +5,20 @@
 #include <stdio.h>
 #include <assert.h>
 #include <sys/errno.h>
+#include "config.h"
+
+#ifndef stdlog
+#define stdlog  stderr
+#else
+extern FILE *stdlog;
+#endif
 
 #ifdef DEBUG
-#define log(level, format, ...) fprintf(stderr, "[%s](%s: %d) " format "\n", level, __FILE__, __LINE__,##__VA_ARGS__)
+#define log(level, format, ...) fprintf(stdlog, "[%s](%s: %d) " format "\n", level, __FILE__, __LINE__,##__VA_ARGS__)
 #define debug(...)              log("debug", __VA_ARGS__)
 #define require(x)              assert(x)
 #else
-#define log(level, format, ...) fprintf(stderr, "[%s] " format "\n", level,##__VA_ARGS__)
+#define log(level, format, ...) fprintf(stdlog, "[%s] " format "\n", level,##__VA_ARGS__)
 #define debug(...)
 #define require(x)
 #endif

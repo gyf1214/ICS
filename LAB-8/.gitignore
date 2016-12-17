@@ -3,3 +3,4 @@ proxy
 adder
 tiny/tiny
 src/csapp.*
+*.log
