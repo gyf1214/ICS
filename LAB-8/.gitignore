@@ -6,3 +6,5 @@ src/csapp.*
 *.log
 .proxy
 .noproxy
+proxylab-handout/
+*.tar

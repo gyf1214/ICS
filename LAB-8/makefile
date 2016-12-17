@@ -26,7 +26,8 @@ $(OBJS) : %.o : src/%.c src/util.h src/config.h makefile
 # hand in to Autolab.
 
 handin:
-	tar cvf handin.tar src makefile
+	cp -r src makefile proxylab-handout/
+	tar cvf handin.tar proxylab-handout
 
 clean:
 	rm -f *~ *.o proxy core *.tar *.zip *.gzip *.bzip *.gz
