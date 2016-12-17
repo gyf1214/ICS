@@ -1,3 +1,5 @@
 *.o
 proxy
+adder
+tiny/tiny
 src/csapp.*
