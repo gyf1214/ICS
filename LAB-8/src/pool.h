@@ -3,7 +3,7 @@
 
 #include "config.h"
 
-typedef void (*Listener)(int, int, const char *);
+typedef void (*Listener)(int);
 
 typedef struct {
     Listener handler[MaxFD];
@@ -11,8 +11,6 @@ typedef struct {
     struct timeval timeout;
     int nfds;
 }Pool;
-
-extern Pool pool;
 
 void initPool(void);
 void listenFD(int, Listener);

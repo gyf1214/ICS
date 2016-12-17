@@ -4,8 +4,7 @@
 #include "pool.h"
 #include "util.h"
 
-Pool pool;
-static char buf[BufSize];
+static Pool pool;
 
 void initPool() {
     debug("init fd pool");
@@ -41,20 +40,6 @@ void closeFD(int fd) {
     close(fd);
 }
 
-static void readFD(int fd) {
-    debug("receive from %d", fd);
-
-    int n = read(fd, buf, BufSize);
-    if (n > 0) {
-        debug("read chunksize %d from %d", n, fd);
-        pool.handler[fd](fd, n, buf);
-    } else {
-        if (n < 0) excp("read failed");
-        debug("get nothing, error or EOF, close %d", fd);
-        closeFD(fd);
-    }
-}
-
 void eventLoop() {
     debug("start event loop");
 
@@ -68,7 +53,7 @@ void eventLoop() {
             int fd;
             for (fd = 0; fd < pool.nfds; ++fd) {
                 if (FD_ISSET(fd, &pool.readySet)) {
-                    readFD(fd);
+                    pool.handler[fd](fd);
                 }
             }
         } else {
