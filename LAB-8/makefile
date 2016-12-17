@@ -26,6 +26,7 @@ $(OBJS) : %.o : src/%.c src/util.h src/config.h makefile
 # hand in to Autolab.
 
 handin:
+	tar cvf handin.tar src makefile
 
 clean:
 	rm -f *~ *.o proxy core *.tar *.zip *.gzip *.bzip *.gz
