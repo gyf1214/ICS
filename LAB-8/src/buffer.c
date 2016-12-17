@@ -26,7 +26,7 @@ int fillBuffer(LineBuffer *p) {
 }
 
 const char *readLine(LineBuffer *p) {
-    debug("%d flush line", p -> fd)
+    debug("%d flush line", p -> fd);
     int count = 0;
     const char *ret = p -> next;
     for (; *p -> next != '\n' && count < p -> remain; ++p -> next, ++count);
@@ -36,14 +36,14 @@ const char *readLine(LineBuffer *p) {
         ++p -> next;
         if (count > MaxLine) error("MaxLine exceeded");
         p -> remain -= count;
-        debug("%d flush %d bytes, remain %d bytes", count, p -> remain);
+        debug("%d flush %d bytes, remain %d bytes", p -> fd, count, p -> remain);
         return ret;
     } else {
         if (count > MaxLine) error("MaxLine exceeded");
 
         memmove(p -> data, ret, count);
         p -> next = p -> data;
-        debug("%d no new line, remain %d bytes", count);
+        debug("%d no new line, remain %d bytes", p -> fd, count);
         return NULL;
     }
 }
