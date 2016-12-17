@@ -195,6 +195,7 @@ static int handleHeader(Connection *p, const char *buf) {
 
     char *header = now;
     if (!split(&buf, &now, ':', 1)) return 0;
+    debug("parse header: %s", header);
 
     if (!strcmp(header, "Connection") || !strcmp(header, "Proxy-Connection")) return 1;
     if (!strcmp(header, "Content-Length")) {
