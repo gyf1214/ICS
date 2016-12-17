@@ -19,7 +19,7 @@ $(LIBS) : %.o : src/%.h
 proxy : $(OBJS)
 	$(CC) $(CFLAGS) $(LDFLAGS) -o $@ $^
 
-$(OBJS) : %.o : src/%.c src/util.h makefile
+$(OBJS) : %.o : src/%.c src/util.h src/config.h makefile
 	$(CC) -c $(CFLAGS) -o $@ $<
 
 # Creates a tarball in ../proxylab-handin.tar that you should then
