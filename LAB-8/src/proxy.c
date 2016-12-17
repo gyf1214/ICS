@@ -161,7 +161,8 @@ static void writeDefaultHeader(int fd) {
         "Connection: close\r\n",
         "Proxy-Connection: close\r\n",
     };
-    for (int i = 0; i < 2; ++i) {
+    int i;
+    for (i = 0; i < 2; ++i) {
         write(fd, str[i], strlen(str[i]));
     }
 }
