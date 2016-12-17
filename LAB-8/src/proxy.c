@@ -112,7 +112,9 @@ static int parseURI(const char *buf, URI *uri) {
 
     const char *fit = HTTP;
     for (; *buf && *fit; ++buf, ++fit) {
-        if (*buf != *fit) return 0;
+        char c = *buf;
+        if (c >= 'A' && c <= 'Z') c += 'a' - 'A';
+        if (c != *fit) return 0;
     }
 
     host = now;
@@ -217,7 +219,7 @@ static void requestHandler(int fd) {
         return;
     }
 
-    while (p -> state != content && (line = readLine(&p -> buf))) {
+    while (flag && p -> state != content && (line = readLine(&p -> buf))) {
         if (p -> state == uri) {
             flag = handleURI(p, line);
         } else {
