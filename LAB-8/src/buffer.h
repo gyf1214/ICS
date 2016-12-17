@@ -12,6 +12,6 @@ typedef struct {
 
 void initBuffer(LineBuffer *, int);
 int fillBuffer(LineBuffer *);
-char *readLine(LineBuffer *);
+const char *readLine(LineBuffer *);
 
 #endif
