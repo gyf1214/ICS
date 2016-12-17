@@ -16,6 +16,10 @@ int fillBuffer(LineBuffer *p) {
     require(p -> remain <= MaxLine);
 
     int ret = read(p -> fd, p -> data + p -> remain, BufSize);
+    if (ret < 0) {
+        excp("read failed");
+        return ret;
+    }
     p -> remain += ret;
     debug("%d get %d bytes, remain %d bytes", p -> fd, ret, p -> remain);
     return ret;
@@ -42,4 +46,11 @@ const char *readLine(LineBuffer *p) {
         debug("%d no new line, remain %d bytes", count);
         return NULL;
     }
+}
+
+void flushBuffer(LineBuffer *p) {
+    debug("%d flush buffer", p -> fd);
+
+    p -> next = p -> data;
+    p -> remain = 0;
 }

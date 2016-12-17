@@ -5,16 +5,19 @@
 #include "buffer.h"
 
 enum State {
-    url, header, content
+    uri, header, content, closed
 };
 
 typedef struct {
     int dst, src;
     LineBuffer buf;
     enum State state;
+    int content;
 }Connection;
 
-extern Connection *conn[MaxFD];
+typedef struct {
+    const char *method, *host, *port, *request;
+}URI;
 
 void createServer(const char *);
 

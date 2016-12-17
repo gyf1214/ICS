@@ -13,5 +13,6 @@ typedef struct {
 void initBuffer(LineBuffer *, int);
 int fillBuffer(LineBuffer *);
 const char *readLine(LineBuffer *);
+void flushBuffer(LineBuffer *);
 
 #endif
