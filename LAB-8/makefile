@@ -9,7 +9,7 @@ CC = gcc
 CFLAGS = -g -Wall -DDEBUG
 LDFLAGS = -lpthread
 
-LIBS = proxy.o pool.o
+LIBS = proxy.o pool.o buffer.o
 OBJS = $(LIBS) main.o
 
 all : proxy
