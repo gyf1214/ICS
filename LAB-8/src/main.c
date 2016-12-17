@@ -1,5 +1,7 @@
+#include <unistd.h>
 #include <stdlib.h>
 #include <stdio.h>
+#include <signal.h>
 #include "proxy.h"
 #include "pool.h"
 
@@ -19,6 +21,9 @@ int main(int argc, char **argv) {
         printf("usage: %s <port>\n", argv[0]);
         exit(0);
     }
+
+    signal(SIGPIPE, SIG_IGN);
+
 #ifdef logPath
     logFile = fopen(logPath, "a");
 #endif
