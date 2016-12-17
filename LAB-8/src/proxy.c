@@ -200,6 +200,7 @@ static int handleHeader(Connection *p, const char *buf) {
     if (!strcmp(header, "Connection") || !strcmp(header, "Proxy-Connection")) return 1;
     if (!strcmp(header, "Content-Length")) {
         p -> content = atoi(buf);
+        debug("content length: %d", p -> content);
     }
 
     write(p -> src, l, strlen(l));
