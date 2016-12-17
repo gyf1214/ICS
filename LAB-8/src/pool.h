@@ -14,6 +14,7 @@ typedef struct {
 
 void initPool(void);
 void listenFD(int, Listener);
+void unbindFD(int);
 void closeFD(int);
 void eventLoop(void);
 

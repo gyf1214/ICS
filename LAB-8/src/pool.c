@@ -27,15 +27,19 @@ void listenFD(int fd, Listener l) {
     if (fd + 1 > pool.nfds) pool.nfds = fd + 1;
 }
 
-void closeFD(int fd) {
+void unbindFD(int fd) {
     require(fd > 0 && fd < MaxFD);
     require(FD_ISSET(fd, &pool.listenSet));
-    debug("close %d", fd);
+    debug("unbind %d", fd);
 
     pool.handler[fd] = NULL;
     FD_CLR(fd, &pool.listenSet);
     while (pool.nfds > 0 && !FD_ISSET(pool.nfds - 1, &pool.listenSet)) --pool.nfds;
+}
 
+void closeFD(int fd) {
+    if (FD_ISSET(fd, &pool.listenSet)) unbindFD(fd);
+    debug("close %d", fd);
     close(fd);
 }
 

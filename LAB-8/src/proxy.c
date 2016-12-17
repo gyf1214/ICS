@@ -141,7 +141,19 @@ static int parseURI(const char *buf, URI *uri) {
 }
 
 static void clientHandler(int fd) {
-    //TODO
+    Connection *p = conn[fd];
+
+    static char buf[BufSize];
+
+    int n = read(fd, buf, BufSize);
+
+    if (n <= 0) {
+        debug("EOF or error detected from %d, close", fd);
+        closeConnection(p);
+    } else {
+        debug("transfer %d bytes to %d\n", n, p -> dst);
+        write(p -> dst, buf, n);
+    }
 }
 
 static void writeDefaultHeader(int fd) {
@@ -184,12 +196,13 @@ static int handleURI(Connection *p, const char *line) {
 
 static int handleHeader(Connection *p, const char *buf) {
     static char line[MaxLine];
+    static char req[MaxLine];
     char *now = line;
-    const char *l = buf;
 
     if (!*buf || (*buf == '\r' && !*(buf + 1))) {
         debug("complete header from %d", p -> dst);
         debug("content length: %d", p -> content);
+        write(p -> src, "\r\n", 2);
         p -> state = content;
         return 1;
     }
@@ -198,12 +211,17 @@ static int handleHeader(Connection *p, const char *buf) {
     if (!split(&buf, &now, ':', 1)) return 0;
     debug("parse header: %s", header);
 
+    char *value = now;
+    split(&buf, &now, '\r', 1);
+    debug("parse value: %s", value);
+
     if (!strcmp(header, "Connection") || !strcmp(header, "Proxy-Connection")) return 1;
     if (!strcmp(header, "Content-Length")) {
-        p -> content = atoi(buf);
+        p -> content = atoi(value);
     }
 
-    write(p -> src, l, strlen(l));
+    sprintf(req, "%s: %s\r\n", header, value);
+    write(p -> src, req, strlen(req));
 
     return 1;
 }
@@ -242,6 +260,7 @@ static void requestHandler(int fd) {
             flushBuffer(&p -> buf);
         } else {
             debug("complete request from %d", p -> dst);
+            unbindFD(p -> dst);
             p -> state = closed;
         }
     }
