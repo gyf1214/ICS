@@ -4,3 +4,5 @@ adder
 tiny/tiny
 src/csapp.*
 *.log
+.proxy
+.noproxy
