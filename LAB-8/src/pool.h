@@ -1,7 +1,6 @@
 #ifndef __POOL
 #define __POOL
 
-#include <sys/select.h>
 #include "config.h"
 
 typedef void (*Listener)(int, int, const char *);
