@@ -249,6 +249,7 @@ static void requestHandler(int fd) {
 
     if (!flag) {
         warn("invalid request from %d", fd);
+        closeConnection(p);
         return;
     }
 

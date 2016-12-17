@@ -3,7 +3,9 @@
 #include "proxy.h"
 #include "pool.h"
 
+#ifdef logPath
 FILE *logFile;
+#endif
 
 /* Recommended max cache and object sizes */
 // #define MAX_CACHE_SIZE 1049000
@@ -17,8 +19,9 @@ int main(int argc, char **argv) {
         printf("usage: %s <port>\n", argv[0]);
         exit(0);
     }
-
+#ifdef logPath
     logFile = fopen(logPath, "a");
+#endif
 
     initPool();
     createServer(argv[1]);
