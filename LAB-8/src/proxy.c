@@ -151,7 +151,7 @@ static void clientHandler(int fd) {
         debug("EOF or error detected from %d, close", fd);
         closeConnection(p);
     } else {
-        debug("transfer %d bytes to %d\n", n, p -> dst);
+        debug("transfer %d bytes to %d", n, p -> dst);
         write(p -> dst, buf, n);
     }
 }
