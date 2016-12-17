@@ -189,6 +189,7 @@ static int handleHeader(Connection *p, const char *buf) {
 
     if (!*buf || (*buf == '\r' && !*(buf + 1))) {
         debug("complete header from %d", p -> dst);
+        debug("content length: %d", p -> content);
         p -> state = content;
         return 1;
     }
@@ -200,7 +201,6 @@ static int handleHeader(Connection *p, const char *buf) {
     if (!strcmp(header, "Connection") || !strcmp(header, "Proxy-Connection")) return 1;
     if (!strcmp(header, "Content-Length")) {
         p -> content = atoi(buf);
-        debug("content length: %d", p -> content);
     }
 
     write(p -> src, l, strlen(l));
@@ -241,7 +241,7 @@ static void requestHandler(int fd) {
             p -> content -= p -> buf.remain;
             flushBuffer(&p -> buf);
         } else {
-            debug("finish request");
+            debug("complete request from %d", p -> dst);
             p -> state = closed;
         }
     }
