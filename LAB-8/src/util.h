@@ -4,6 +4,7 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <assert.h>
+#include <sys/errno.h>
 
 #ifdef DEBUG
 #define log(level, format, ...) fprintf(stderr, "[%s](%s: %d) " format "\n", level, __FILE__, __LINE__,##__VA_ARGS__)
