@@ -6,6 +6,7 @@
 #include "proxy.h"
 #include "util.h"
 #include "pool.h"
+#include "cache.h"
 
 static Connection *conn[MaxFD];
 
@@ -139,17 +140,16 @@ static int parseURI(const char *buf, URI *uri) {
 
 static void clientHandler(int fd) {
     Connection *p = conn[fd];
+    require(p);
 
-    static char buf[BufSize];
+    int n;
+    const char *cacheBuf = cacheHandler(fd, &n);
 
-    int n = read(fd, buf, BufSize);
-
-    if (n <= 0) {
-        debug("EOF or error detected from %d, close", fd);
+    if (!cacheBuf) {
         closeConnection(p);
     } else {
         debug("transfer %d bytes to %d", n, p -> dst);
-        write(p -> dst, buf, n);
+        write(p -> dst, cacheBuf, n);
     }
 }
 
@@ -171,6 +171,15 @@ static int handleURI(Connection *p, const char *line) {
         return 0;
     }
 
+    int n;
+    const char *cacheBuf = queryBlock(&uri, &n);
+    if (cacheBuf) {
+        debug("transfer %d bytes to %d", n, p -> dst);
+        write(p -> dst, cacheBuf, n);
+        p -> state = closed;
+        return 1;
+    }
+
     int clientfd = open_clientfd(uri.host, uri.port);
     if (clientfd < 0) {
         excp("open client %d failed", p -> dst);
@@ -179,6 +188,7 @@ static int handleURI(Connection *p, const char *line) {
     p -> src = clientfd;
     conn[clientfd] = p;
     listenFD(clientfd, clientHandler);
+    initBlock(clientfd, &uri);
 
     static char req[MaxLine];
     sprintf(req, "%s %s %s\r\n", uri.method, uri.request, HTTPVer);
@@ -236,7 +246,8 @@ static void requestHandler(int fd) {
         return;
     }
 
-    while (flag && p -> state != content && (line = readLine(&p -> buf))) {
+    while (flag && (p -> state == uri || p -> state == header)
+                && (line = readLine(&p -> buf))) {
         if (p -> state == uri) {
             flag = handleURI(p, line);
         } else {
@@ -250,9 +261,14 @@ static void requestHandler(int fd) {
         return;
     }
 
+    if (p -> state == closed) {
+        closeConnection(p);
+        return;
+    }
+
     if (p -> state == content) {
         if (p -> content > 0) {
-            if (p -> buf.remain > p -> content) p -> content = p -> buf.remain;
+            if (p -> buf.remain > p -> content) p -> buf.remain = p -> content;
             write(p -> src, p -> buf.next, p -> buf.remain);
             p -> content -= p -> buf.remain;
             flushBuffer(&p -> buf);
