@@ -210,7 +210,7 @@ static int handleHeader(Connection *p, const char *buf) {
 
     char *value = now;
     split(&buf, &now, '\r', 1);
-    debug("parse header: %s=%s", header, value);
+    debug("parse header: %s:%s", header, value);
 
     if (!strcmp(header, "Connection") || !strcmp(header, "Proxy-Connection")) return 1;
     if (!strcmp(header, "Content-Length")) {
