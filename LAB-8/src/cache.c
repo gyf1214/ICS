@@ -4,8 +4,8 @@
 #include "util.h"
 
 #define Mod     23333333333LL
-#define Magic1  137
-#define Magic2  353
+#define Magic1  1373
+#define Magic2  3533
 
 static long long hashString(const char *str) {
     long long ans = 0;
@@ -140,6 +140,7 @@ const char *queryBlock(const URI *uri, int *pn) {
     } else {
         p -> next = q -> next;
     }
+    if (q == tail) tail = p;
     insertTail(q);
     return q -> buf;
 }
