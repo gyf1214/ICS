@@ -1,0 +1,10 @@
+*.o
+proxy
+adder
+tiny/tiny
+src/csapp.*
+*.log
+.proxy
+.noproxy
+proxylab-handout/
+*.tar
