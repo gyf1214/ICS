@@ -12,10 +12,12 @@ LDFLAGS = -lpthread
 LIBS = proxy.o pool.o buffer.o cache.o
 OBJS = $(LIBS) main.o
 
+all : proxy
+
 test: all
 	./driver.sh
 
-all : proxy
+.PHONY: test all handin clean
 
 $(LIBS) : %.o : src/%.h
 
