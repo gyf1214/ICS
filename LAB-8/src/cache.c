@@ -59,7 +59,7 @@ static void prepareBlock(int size) {
         CacheBlock *now = head;
         debug("evict block %016llX", now -> hashcode);
         head = now -> next;
-        sizeCount -= now -> size;
+        sizeCount -= now -> size - sizeof(CacheBlock);
         freeBlock(now);
     }
     sizeCount += size;
