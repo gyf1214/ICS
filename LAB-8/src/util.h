@@ -7,11 +7,7 @@
 #include <sys/errno.h>
 #include "config.h"
 
-#ifndef stdlog
-#define stdlog  stderr
-#else
 extern FILE *stdlog;
-#endif
 
 #ifdef DEBUG
 #define log(level, format, ...) fprintf(stdlog, "[%s](%s: %d) " format "\n", level, __FILE__, __LINE__,##__VA_ARGS__)

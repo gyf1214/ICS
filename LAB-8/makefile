@@ -6,13 +6,18 @@
 # Makefile to build your proxy from sources.
 #
 CC = gcc
-CFLAGS = -g -Wall -DDEBUG
+CFLAGS = -O2 -Wall -DDEBUG
 LDFLAGS = -lpthread
 
-LIBS = proxy.o pool.o buffer.o
+LIBS = proxy.o pool.o buffer.o cache.o
 OBJS = $(LIBS) main.o
 
 all : proxy
+
+test: all
+	./driver.sh
+
+.PHONY: test all handin clean
 
 $(LIBS) : %.o : src/%.h
 
@@ -25,9 +30,11 @@ $(OBJS) : %.o : src/%.c src/util.h src/config.h makefile
 # Creates a tarball in ../proxylab-handin.tar that you should then
 # hand in to Autolab.
 
-handin:
+handin: clean
+	mkdir proxylab-handout
 	cp -r src makefile proxylab-handout/
 	tar cvf handin.tar proxylab-handout
 
 clean:
-	rm -f *~ *.o proxy core *.tar *.zip *.gzip *.bzip *.gz
+	rm -fr *~ *.o proxy core *.tar *.zip *.gzip *.bzip *.gz *.log
+	rm -fr proxylab-handout
