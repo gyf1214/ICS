@@ -59,9 +59,20 @@ static void prepareBlock(int size) {
         CacheBlock *now = head;
         debug("evict block %016llX", now -> hashcode);
         head = now -> next;
+        sizeCount -= now -> size;
         freeBlock(now);
     }
     sizeCount += size;
+}
+
+static void insertTail(CacheBlock *block) {
+    block -> next = NULL;
+    if (!head) {
+        head = tail = block;
+    } else {
+        tail -> next = block;
+        tail = block;
+    }
 }
 
 static void insertBlock(CacheBlock *block) {
@@ -70,12 +81,7 @@ static void insertBlock(CacheBlock *block) {
     debug("insert block %016llX", block -> hashcode);
     block -> buf = realloc(block -> buf, block -> size);
     prepareBlock(block -> size);
-    if (!head) {
-        head = tail = block;
-    } else {
-        tail -> next = block;
-        tail = block;
-    }
+    insertTail(block);
     debug("cache size: %d", sizeCount);
 }
 
@@ -94,6 +100,7 @@ const char *cacheHandler(int fd, int *pn) {
     } else {
         ret = temp[fd] -> buf + temp[fd] -> size;
         n = read(fd, ret, ObjectSize - temp[fd] -> size);
+        temp[fd] -> size += n;
     }
 
     if (n <= 0) {
@@ -133,8 +140,6 @@ const char *queryBlock(const URI *uri, int *pn) {
     } else {
         p -> next = q -> next;
     }
-    tail -> next = q;
-    q -> next = NULL;
-    tail = q;
+    insertTail(q);
     return q -> buf;
 }
