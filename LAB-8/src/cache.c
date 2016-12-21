@@ -40,13 +40,13 @@ void initBlock(int fd, const URI *uri) {
     temp[fd] -> next = NULL;
     temp[fd] -> buf = malloc(ObjectSize);
 
-    debug("block hashcode: %016llX", temp[fd] -> hashcode);
+    debug("block hashcode: %010llX", temp[fd] -> hashcode);
 }
 
 static void freeBlock(CacheBlock *block) {
     require(block);
 
-    debug("drop block %016llX", block -> hashcode);
+    debug("drop block %010llX", block -> hashcode);
     if (block -> buf) free(block -> buf);
     free(block);
 }
@@ -57,7 +57,7 @@ static void prepareBlock(int size) {
         require(head);
 
         CacheBlock *now = head;
-        debug("evict block %016llX", now -> hashcode);
+        debug("evict block %010llX", now -> hashcode);
         head = now -> next;
         sizeCount -= now -> size - sizeof(CacheBlock);
         freeBlock(now);
@@ -78,7 +78,7 @@ static void insertTail(CacheBlock *block) {
 static void insertBlock(CacheBlock *block) {
     require(block);
 
-    debug("insert block %016llX", block -> hashcode);
+    debug("insert block %010llX", block -> hashcode);
     block -> buf = realloc(block -> buf, block -> size);
     prepareBlock(block -> size);
     insertTail(block);
@@ -121,7 +121,7 @@ const char *cacheHandler(int fd, int *pn) {
 
 const char *queryBlock(const URI *uri, int *pn) {
     long long code = hashURI(uri);
-    debug("find block %016llX", code);
+    debug("find block %010llX", code);
 
     CacheBlock *p, *q;
     for (p = NULL, q = head; q; p = q, q = q -> next) {
@@ -129,11 +129,11 @@ const char *queryBlock(const URI *uri, int *pn) {
     }
 
     if (!q) {
-        debug("miss %016llX", code);
+        debug("miss %010llX", code);
         return NULL;
     }
 
-    debug("hit %016llX, size: %d", code, q -> size);
+    debug("hit %010llX, size: %d", code, q -> size);
     *pn = q -> size;
     if (!p) {
         head = q -> next;
