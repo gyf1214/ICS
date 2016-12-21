@@ -12,7 +12,8 @@ LDFLAGS = -lpthread
 LIBS = proxy.o pool.o buffer.o cache.o
 OBJS = $(LIBS) main.o
 
-test: all driver.sh
+test: all
+	./driver.sh
 
 all : proxy
 
