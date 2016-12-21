@@ -3,9 +3,8 @@
 #include <string.h>
 #include <sys/socket.h>
 #include <netdb.h>
-#include "config.h"
-#include "util.h"
 #include "proxy.h"
+#include "util.h"
 #include "pool.h"
 
 static Connection *conn[MaxFD];
