@@ -3,7 +3,7 @@
 #include "cache.h"
 #include "util.h"
 
-#define Mod     23333333333LL
+#define Mod     999999999989LL
 #define Magic1  1373
 #define Magic2  3533
 
