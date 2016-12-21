@@ -107,7 +107,6 @@ static int parseURI(const char *buf, URI *uri) {
 
     method = now;
     if (!split(&buf, &now, ' ', 1)) return 0;
-    debug("parse method: %s", method);
 
     const char *fit = HTTP;
     for (; *buf && *fit; ++buf, ++fit) {
@@ -125,12 +124,11 @@ static int parseURI(const char *buf, URI *uri) {
     } else {
         port = HTTPPort;
     }
-    debug("parse host: %s", host);
-    debug("parse port: %s", port);
 
     request = now;
     if (!split(&buf, &now, ' ', 1)) return 0;
-    debug("parse request: %s", request);
+
+    debug("parse URI: %s %s:%s%s", method, host, port, request);
 
     uri -> method = method;
     uri -> host = host;
@@ -209,11 +207,10 @@ static int handleHeader(Connection *p, const char *buf) {
 
     char *header = now;
     if (!split(&buf, &now, ':', 1)) return 0;
-    debug("parse header: %s", header);
 
     char *value = now;
     split(&buf, &now, '\r', 1);
-    debug("parse value: %s", value);
+    debug("parse header: %s=%s", header, value);
 
     if (!strcmp(header, "Connection") || !strcmp(header, "Proxy-Connection")) return 1;
     if (!strcmp(header, "Content-Length")) {
@@ -283,6 +280,7 @@ static void listenHandler(int fd) {
     struct sockaddr_storage clientaddr;
     socklen_t clientlen = sizeof(struct sockaddr_storage);
     int connfd = accept(fd, (struct sockaddr *)&clientaddr, &clientlen);
+    debug("accept, open socket %d", connfd);
     openConnection(connfd);
 }
 
