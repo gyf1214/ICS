@@ -1,0 +1,7 @@
+cgi-bin/
+*.o
+tiny-11.6
+tiny-12.16
+hello
+select
+csapp.*
